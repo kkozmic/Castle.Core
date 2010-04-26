@@ -237,7 +237,14 @@ namespace Castle.Core.Smtp
 		{
 			get
 			{
+				#if DOTNET35
 				return SecurityManager.IsGranted(new SecurityPermission(SecurityPermissionFlag.UnmanagedCode));
+#endif
+#if DOTNET40
+				var permissionSet = new PermissionSet(PermissionState.None);
+				permissionSet.AddPermission(new SecurityPermission(SecurityPermissionFlag.UnmanagedCode));
+				return permissionSet.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet);
+#endif
 			}
 		}
 	}

@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-using Logger = Castle.Core.Logging.ILogger;
-
 namespace Castle.Services.Logging.Log4netIntegration
 {
 	using System;
@@ -21,6 +19,8 @@ namespace Castle.Services.Logging.Log4netIntegration
 	using log4net;
 	using log4net.Core;
 	using log4net.Util;
+
+	using Logger = Castle.Core.Logging.ILogger;
 
     [Serializable]
 	public class Log4netLogger : MarshalByRefObject, Logger

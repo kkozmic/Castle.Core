@@ -15,6 +15,7 @@
 namespace Castle.Services.Logging.Log4netIntegration
 {
 	using Castle.Core.Logging;
+
 	using log4net;
 
 	public class ThreadContextStacks : IContextStacks

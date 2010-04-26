@@ -46,8 +46,17 @@ namespace Castle.DynamicProxy
 		{
 			proxyBuilder = builder;
 
-#if !SILVERLIGHT
+#if !SILVERLIGHT && !DOTNET40
 			if (SecurityManager.IsGranted(new SecurityPermission(SecurityPermissionFlag.ControlEvidence | SecurityPermissionFlag.ControlPolicy)))
+			{
+				Logger = new TraceLogger("Castle.DynamicProxy", LoggerLevel.Warn);
+			}
+#endif
+#if DOTNET40
+			var canUseTrace =new PermissionSet(PermissionState.None);
+			canUseTrace.AddPermission(
+				new SecurityPermission(SecurityPermissionFlag.ControlEvidence | SecurityPermissionFlag.ControlPolicy));
+			if(canUseTrace.IsSubsetOf(AppDomain.CurrentDomain.PermissionSet))
 			{
 				Logger = new TraceLogger("Castle.DynamicProxy", LoggerLevel.Warn);
 			}

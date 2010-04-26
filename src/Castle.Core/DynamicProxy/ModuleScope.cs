@@ -306,7 +306,9 @@ namespace Castle.DynamicProxy
 					assemblyName, AssemblyBuilderAccess.RunAndSave, moduleDirectory);
 
 				var module = assemblyBuilder.DefineDynamicModule(moduleName, moduleName, false);
+#if DOTNET35
 				WorkaroundIssue98.ForModule(module);
+#endif
 				return module;
 			}
 			else
@@ -317,7 +319,9 @@ namespace Castle.DynamicProxy
 					AssemblyBuilderAccess.Run);
 
 				var module = assemblyBuilder.DefineDynamicModule(moduleName, false);
+#if DOTNET35
 				WorkaroundIssue98.ForModule(module);
+#endif
 				return module;
 			}
 		}
