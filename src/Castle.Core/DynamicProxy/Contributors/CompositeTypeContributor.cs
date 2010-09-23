@@ -130,7 +130,7 @@ namespace Castle.DynamicProxy.Contributors
 			}
 		}
 
-		protected abstract MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
+		protected abstract MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter proxy,
 		                                           ProxyGenerationOptions options, OverrideMethodDelegate overrideMethod);
 
 		private void ImplementMethod(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options,

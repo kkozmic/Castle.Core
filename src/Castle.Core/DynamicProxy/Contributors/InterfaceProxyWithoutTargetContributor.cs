@@ -42,7 +42,7 @@ namespace Castle.DynamicProxy.Contributors
 			}
 		}
 
-		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options, OverrideMethodDelegate overrideMethod)
+		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter proxy, ProxyGenerationOptions options, OverrideMethodDelegate overrideMethod)
 		{
 			if (!method.Proxyable)
 			{
@@ -50,18 +50,18 @@ namespace Castle.DynamicProxy.Contributors
 														overrideMethod);
 			}
 
-			var invocation = GetInvocationType(method, @class, options);
+			var invocation = GetInvocationType(method, proxy, options);
 			return new MethodWithInvocationGenerator(method,
-			                                         @class.GetField("__interceptors"),
+			                                         proxy.GetField("__interceptors"),
 			                                         invocation,
 			                                         getTargetExpression,
 			                                         overrideMethod,
 			                                         null);
 		}
 
-		private Type GetInvocationType(MetaMethod method, ClassEmitter emitter, ProxyGenerationOptions options)
+		private Type GetInvocationType(MetaMethod method, ClassEmitter proxy, ProxyGenerationOptions options)
 		{
-			var scope = emitter.ModuleScope;
+			var scope = proxy.ModuleScope;
 			var key = new CacheKey(method.Method, CompositionInvocationTypeGenerator.BaseType, null, null);
 
 			// no locking required as we're already within a lock
@@ -76,7 +76,7 @@ namespace Castle.DynamicProxy.Contributors
 			                                                    method.Method,
 			                                                    false,
 			                                                    null)
-				.Generate(emitter, options, namingScope)
+				.Generate(proxy, options, namingScope)
 				.BuildType();
 
 			scope.RegisterInCache(key, invocation);

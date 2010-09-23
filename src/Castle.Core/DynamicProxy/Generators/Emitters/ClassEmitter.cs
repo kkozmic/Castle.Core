@@ -16,6 +16,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Reflection;
 	using System.Reflection.Emit;
 
@@ -47,9 +48,32 @@ namespace Castle.DynamicProxy.Generators.Emitters
 					TypeBuilder.AddInterfaceImplementation(inter);
 				}
 			}
-
+			var namingScope = modulescope.NamingScope.SafeSubScope();
+			IList<string> cache = new List<string>();
+			CollectGenericParameters(baseType, namingScope,cache);
+			foreach (var @interface in interfaces)
+			{
+				CollectGenericParameters(@interface, namingScope,cache);
+			}
+			DefineGenericParameters(cache);
 			TypeBuilder.SetParent(baseType);
 			moduleScope = modulescope;
+		}
+
+		private void DefineGenericParameters(IList<string> cache)
+		{
+			if (cache.Count == 0) return;
+			var arguments = TypeBuilder.DefineGenericParameters(cache.ToArray());
+		}
+
+		private void CollectGenericParameters(Type type, INamingScope namingScope, IList<string> cache)
+		{
+			if(type.IsGenericTypeDefinition == false) return;
+			var arguments = type.GetGenericArguments();
+			foreach (var argument in arguments)
+			{
+				cache.Add(namingScope.GetUniqueName(argument.Name));
+			}
 		}
 
 		public ModuleScope ModuleScope
@@ -89,13 +113,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				return interfaces;
 			}
 
-			foreach (var inter in interfaces)
-			{
-				if (inter.IsGenericTypeDefinition)
-				{
-					throw new NotSupportedException("ClassEmitter does not support open generic interfaces. Type: " + inter.FullName);
-				}
-			}
 			return interfaces;
 		}
 	}

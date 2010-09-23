@@ -16,6 +16,7 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Reflection;
 	using System.Xml.Serialization;
@@ -40,8 +41,13 @@ namespace Castle.DynamicProxy.Generators
 		{
 			// make sure ProxyGenerationOptions is initialized
 			options.Initialize();
+			var closingTypes = Type.EmptyTypes;
+			if (targetType.IsGenericType)
+			{
+				closingTypes = targetType.GetGenericArguments();
+				targetType = targetType.GetGenericTypeDefinition();
+			}
 
-			CheckNotGenericTypeDefinition(proxyTargetType, "proxyTargetType");
 			CheckNotGenericTypeDefinitions(interfaces, "interfaces");
 			EnsureValidBaseType(options.BaseTypeForInterfaceProxy);
 			ProxyGenerationOptions = options;
@@ -49,8 +55,14 @@ namespace Castle.DynamicProxy.Generators
 			interfaces = TypeUtil.GetAllInterfaces(interfaces).ToArray();
 			var cacheKey = new CacheKey(proxyTargetType, targetType, interfaces, options);
 
-			return ObtainProxyType(cacheKey, (n, s) => GenerateType(n, proxyTargetType, interfaces, s));
-
+			var proxyType = ObtainProxyType(cacheKey, (n, s) => GenerateType(n, targetType, interfaces, s));
+			if (closingTypes.Length > 0)
+			{
+				Debug.Assert(proxyType.IsGenericTypeDefinition);
+				proxyType = proxyType.MakeGenericType(closingTypes);
+				InitializeStaticFields(proxyType);
+			}
+			return proxyType;
 		}
 
 		private void EnsureValidBaseType(Type type)
@@ -66,13 +78,13 @@ namespace Castle.DynamicProxy.Generators
 				ThrowInvalidBaseType(type, "it is not a class type");
 			}
 
-			if(type.IsSealed)
+			if (type.IsSealed)
 			{
 				ThrowInvalidBaseType(type, "it is sealed");
 			}
 
 			var constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-			                                      null, Type.EmptyTypes, null);
+												  null, Type.EmptyTypes, null);
 
 			if (constructor == null || constructor.IsPrivate)
 			{
@@ -221,8 +233,14 @@ namespace Castle.DynamicProxy.Generators
 			// 3. then additional interfaces
 			foreach (var @interface in additionalInterfaces)
 			{
-				if(typeImplementerMapping.ContainsKey(@interface)) continue;
-				if(ProxyGenerationOptions.MixinData.ContainsMixin(@interface)) continue;
+				if (typeImplementerMapping.ContainsKey(@interface))
+				{
+					continue;
+				}
+				if (ProxyGenerationOptions.MixinData.ContainsMixin(@interface))
+				{
+					continue;
+				}
 
 				additionalInterfacesContributor.AddInterfaceToProxy(@interface);
 				AddMappingNoCheck(@interface, additionalInterfacesContributor, typeImplementerMapping);

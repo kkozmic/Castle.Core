@@ -40,7 +40,7 @@ namespace Castle.DynamicProxy.Generators
 	{
 		private readonly ModuleScope scope;
 
-		protected readonly Type targetType;
+		protected Type targetType;
 		private ILogger logger = NullLogger.Instance;
 		private ProxyGenerationOptions proxyGenerationOptions;
 
@@ -86,8 +86,9 @@ namespace Castle.DynamicProxy.Generators
 			return emitter.CreateStaticField("proxyGenerationOptions", typeof(ProxyGenerationOptions));
 		}
 
-		protected void InitializeStaticFields(Type builtType)
+		protected virtual void InitializeStaticFields(Type builtType)
 		{
+			if (builtType.IsGenericTypeDefinition) return;
 			builtType.SetStaticField("proxyGenerationOptions", BindingFlags.Public, ProxyGenerationOptions);
 		}
 
@@ -110,9 +111,6 @@ namespace Castle.DynamicProxy.Generators
 
 		protected virtual ClassEmitter BuildClassEmitter(string typeName, Type parentType, IEnumerable<Type> interfaces)
 		{
-			CheckNotGenericTypeDefinition(parentType, "parentType");
-			CheckNotGenericTypeDefinitions(interfaces, "interfaces");
-
 			return new ClassEmitter(Scope, typeName, parentType, interfaces);
 		}
 

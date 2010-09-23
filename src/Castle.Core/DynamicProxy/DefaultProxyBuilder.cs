@@ -127,12 +127,6 @@ namespace Castle.DynamicProxy
 
 		private void AssertValidType(Type target)
 		{
-			if (target.IsGenericTypeDefinition)
-			{
-				throw new GeneratorException("Type " + target.FullName + " is a generic type definition. " +
-				                             "Can not create proxy for open generic types.");
-			}
-
 			if (IsAccessible(target) == false)
 			{
 				throw new GeneratorException("Type " + target.FullName + " is not public. " +

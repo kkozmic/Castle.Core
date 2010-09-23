@@ -55,7 +55,7 @@ namespace Castle.DynamicProxy.Contributors
 			}
 		}
 
-		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class,
+		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter proxy,
 		                                                      ProxyGenerationOptions options,
 		                                                      OverrideMethodDelegate overrideMethod)
 		{
@@ -73,14 +73,14 @@ namespace Castle.DynamicProxy.Contributors
 #if SILVERLIGHT
 				return null;
 #else
-				return ExplicitlyImplementedInterfaceMethodGenerator(method, @class, options, overrideMethod);
+				return ExplicitlyImplementedInterfaceMethodGenerator(method, proxy, options, overrideMethod);
 #endif
 			}
 
-			var invocation = GetInvocationType(method, @class, options);
+			var invocation = GetInvocationType(method, proxy, options);
 
 			return new MethodWithInvocationGenerator(method,
-			                                         @class.GetField("__interceptors"),
+			                                         proxy.GetField("__interceptors"),
 			                                         invocation,
 			                                         (c, m) => new TypeTokenExpression(targetType),
 			                                         overrideMethod,
@@ -106,10 +106,10 @@ namespace Castle.DynamicProxy.Contributors
 				.BuildType();
 		}
 
-		private MethodBuilder CreateCallbackMethod(ClassEmitter emitter, MethodInfo methodInfo, MethodInfo methodOnTarget)
+		private MethodBuilder CreateCallbackMethod(ClassEmitter @class, MethodInfo method, MethodInfo methodOnTarget)
 		{
-			var targetMethod = methodOnTarget ?? methodInfo;
-			var callBackMethod = emitter.CreateMethod(namingScope.GetUniqueName(methodInfo.Name + "_callback"), targetMethod);
+			var targetMethod = methodOnTarget ?? method;
+			var callBackMethod = @class.CreateMethod(namingScope.GetUniqueName(method.Name + "_callback"), targetMethod);
 
 			if (targetMethod.IsGenericMethod)
 				targetMethod = targetMethod.MakeGenericMethod(callBackMethod.GenericTypeParams);

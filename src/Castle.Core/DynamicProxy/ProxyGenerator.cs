@@ -26,6 +26,7 @@ namespace Castle.DynamicProxy
 	using System.Text;
 	using Castle.Core.Internal;
 	using Castle.Core.Logging;
+	using Castle.DynamicProxy.Generators;
 
 	/// <summary>
 	///   Provides proxy objects for classes and interfaces.
@@ -800,10 +801,7 @@ namespace Castle.DynamicProxy
 			{
 				throw new ArgumentException("Specified type is not an interface", "interfaceToProxy");
 			}
-
-			CheckNotGenericTypeDefinition(interfaceToProxy, "interfaceToProxy");
-			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
-
+			
 			var generatedType = CreateInterfaceProxyTypeWithoutTarget(interfaceToProxy, additionalInterfacesToProxy, options);
 			var arguments = GetConstructorArguments(null, interceptors, options);
 			return Activator.CreateInstance(generatedType, arguments.ToArray());

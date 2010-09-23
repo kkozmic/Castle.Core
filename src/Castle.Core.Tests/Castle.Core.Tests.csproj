@@ -144,10 +144,14 @@
     <Compile Include="GenerationHookTestCase.cs" />
     <Compile Include="GenericClassProxyTestCase.cs" />
     <Compile Include="GenericInterfaceProxyTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericProxiesTestCase.cs" />
     <Compile Include="GenInterfaces\GenInterface.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenericTypes.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethods.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethodsAndGenReturn.cs" />
+    <Compile Include="GenInterfaces\IEmptyGeneric.cs" />
+    <Compile Include="GenInterfaces\IEmptyGeneric2.cs" />
+    <Compile Include="GenInterfaces\IGenericWithMethod.cs" />
     <Compile Include="Interceptors\LogInvocationInterceptor.cs" />
     <Compile Include="Interceptors\ThrowingInterceptor.cs" />
     <Compile Include="InterClasses\IExtendedService.cs" />

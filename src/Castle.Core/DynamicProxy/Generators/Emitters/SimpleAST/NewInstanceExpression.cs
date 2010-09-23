@@ -31,10 +31,10 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 			arguments = args;
 		}
 
-		public NewInstanceExpression(Type target, Type[] constructor_args, params Expression[] args)
+		public NewInstanceExpression(Type target, Type[] constructorArgs, params Expression[] args)
 		{
 			type = target;
-			this.constructorArgs = constructor_args;
+			this.constructorArgs = constructorArgs;
 			arguments = args;
 		}
 

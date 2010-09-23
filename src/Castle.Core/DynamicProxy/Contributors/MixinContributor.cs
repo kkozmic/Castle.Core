@@ -87,7 +87,7 @@ namespace Castle.DynamicProxy.Contributors
 			empty.Add(@interface);
 		}
 
-		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options, OverrideMethodDelegate overrideMethod)
+		protected override MethodGenerator GetMethodGenerator(MetaMethod method, ClassEmitter proxy, ProxyGenerationOptions options, OverrideMethodDelegate overrideMethod)
 		{
 			if (!method.Proxyable)
 			{
@@ -96,9 +96,9 @@ namespace Castle.DynamicProxy.Contributors
 				                                     (c, i) => fields[i.DeclaringType]);
 			}
 
-			var invocation = GetInvocationType(method, @class, options);
+			var invocation = GetInvocationType(method, proxy, options);
 			return new MethodWithInvocationGenerator(method,
-			                                         @class.GetField("__interceptors"),
+			                                         proxy.GetField("__interceptors"),
 			                                         invocation,
 			                                         getTargetExpression,
 			                                         overrideMethod,

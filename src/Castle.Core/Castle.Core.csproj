@@ -160,7 +160,6 @@
     <Compile Include="DynamicProxy\Generators\DelegateProxyGenerationHook.cs" />
     <Compile Include="DynamicProxy\Generators\DelegateProxyGenerator.cs" />
     <Compile Include="DynamicProxy\Contributors\DelegateProxyTargetContributor.cs" />
-    <Compile Include="DynamicProxy\Generators\Emitters\SimpleAST\BindDelegateExpression.cs" />
     <Compile Include="DynamicProxy\Generators\IInvocationCreationContributor.cs" />
     <Compile Include="DynamicProxy\Generators\InheritanceInvocationTypeGenerator.cs" />
     <Compile Include="DynamicProxy\Generators\ClassProxyWithTargetGenerator.cs" />
