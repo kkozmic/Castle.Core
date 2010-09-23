@@ -30,7 +30,6 @@ namespace Castle.DynamicProxy.Generators
 	{
 		protected FieldReference targetField;
 
-
 		public InterfaceProxyWithTargetGenerator(ModuleScope scope, Type @interface)
 			: base(scope, @interface)
 		{
@@ -55,7 +54,7 @@ namespace Castle.DynamicProxy.Generators
 			interfaces = TypeUtil.GetAllInterfaces(interfaces).ToArray();
 			var cacheKey = new CacheKey(proxyTargetType, targetType, interfaces, options);
 
-			var proxyType = ObtainProxyType(cacheKey, (n, s) => GenerateType(n, targetType, interfaces, s));
+			var proxyType = ObtainProxyType(cacheKey, (n, s) => GenerateType(n, proxyTargetType, interfaces, s));
 			if (closingTypes.Length > 0)
 			{
 				Debug.Assert(proxyType.IsGenericTypeDefinition);
@@ -78,13 +77,13 @@ namespace Castle.DynamicProxy.Generators
 				ThrowInvalidBaseType(type, "it is not a class type");
 			}
 
-			if (type.IsSealed)
+			if(type.IsSealed)
 			{
 				ThrowInvalidBaseType(type, "it is sealed");
 			}
 
 			var constructor = type.GetConstructor(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-												  null, Type.EmptyTypes, null);
+			                                      null, Type.EmptyTypes, null);
 
 			if (constructor == null || constructor.IsPrivate)
 			{
@@ -105,7 +104,7 @@ namespace Castle.DynamicProxy.Generators
 
 			ClassEmitter emitter;
 			FieldReference interceptorsField;
-			Type baseType = Init(typeName, out emitter, proxyTargetType, out interceptorsField, allInterfaces);
+			var baseType = Init(typeName, out emitter, proxyTargetType, out interceptorsField, allInterfaces);
 
 			var model = new MetaType();
 			// Collect methods
@@ -129,7 +128,6 @@ namespace Castle.DynamicProxy.Generators
 				if (contributor is MixinContributor)
 				{
 					ctorArguments.AddRange((contributor as MixinContributor).Fields);
-					
 				}
 			}
 
@@ -147,7 +145,7 @@ namespace Castle.DynamicProxy.Generators
 			CompleteInitCacheMethod(cctor.CodeBuilder);
 
 			// Crosses fingers and build type
-			Type generatedType = emitter.BuildType();
+			var generatedType = emitter.BuildType();
 
 			InitializeStaticFields(generatedType);
 			return generatedType;
@@ -198,9 +196,10 @@ namespace Castle.DynamicProxy.Generators
 			var mixins = new MixinContributor(namingScope, AllowChangeTarget) { Logger = Logger };
 			// Order of interface precedence:
 			// 1. first target
-			ICollection<Type> targetInterfaces = proxyTargetType.GetAllInterfaces();
-			ICollection<Type> additionalInterfaces = TypeUtil.GetAllInterfaces(interfaces);
-			var target = AddMappingForTargetType(typeImplementerMapping, proxyTargetType, targetInterfaces, additionalInterfaces,namingScope);
+			var targetInterfaces = proxyTargetType.GetAllInterfaces();
+			var additionalInterfaces = TypeUtil.GetAllInterfaces(interfaces);
+			var target = AddMappingForTargetType(typeImplementerMapping, proxyTargetType, targetInterfaces, additionalInterfaces,
+			                                     namingScope);
 
 			// 2. then mixins
 			if (ProxyGenerationOptions.HasMixins)
@@ -210,7 +209,7 @@ namespace Castle.DynamicProxy.Generators
 					if (targetInterfaces.Contains(mixinInterface))
 					{
 						// OK, so the target implements this interface. We now do one of two things:
-						if(additionalInterfaces.Contains(mixinInterface))
+						if (additionalInterfaces.Contains(mixinInterface))
 						{
 							// we intercept the interface, and forward calls to the target type
 							AddMapping(mixinInterface, target, typeImplementerMapping);
