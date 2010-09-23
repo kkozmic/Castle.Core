@@ -39,9 +39,9 @@ namespace Castle.DynamicProxy.Contributors
 
 		#region IGenerator<AbstractTypeEmitter> Members
 
-		public AbstractTypeEmitter Generate(ClassEmitter @class, ProxyGenerationOptions options, INamingScope namingScope)
+		public AbstractTypeEmitter Generate(ClassEmitter proxy, ProxyGenerationOptions options, INamingScope namingScope)
 		{
-			var emitter = GetEmitter(@class, namingScope);
+			var emitter = GetEmitter(proxy, namingScope);
 			BuildConstructor(emitter);
 			BuildInvokeMethod(emitter);
 			return emitter;

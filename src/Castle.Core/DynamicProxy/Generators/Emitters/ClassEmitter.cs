@@ -16,17 +16,22 @@ namespace Castle.DynamicProxy.Generators.Emitters
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Reflection;
 	using System.Reflection.Emit;
 
+	using Castle.Core;
+
+	[DebuggerDisplay("{TypeBuilder}")]
 	public class ClassEmitter : AbstractTypeEmitter
 	{
 		private readonly ModuleScope moduleScope;
+		private Dictionary<Type, Type> genericParameters;
 		private const TypeAttributes DefaultAttributes = TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Serializable;
 
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces)
-			: this(modulescope, name, baseType, interfaces, DefaultAttributes, ShouldForceUnsigned())
+		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces, params Type[] genericArguments)
+			: this(modulescope, name, baseType, interfaces, DefaultAttributes, ShouldForceUnsigned(), genericArguments)
 		{
 		}
 
@@ -36,7 +41,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		}
 
 		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces, TypeAttributes flags,
-		                    bool forceUnsigned)
+		                    bool forceUnsigned, params Type[] genericArguments)
 			: this(CreateTypeBuilder(modulescope, name, baseType, interfaces, flags, forceUnsigned))
 		{
 			interfaces = InitializeGenericArgumentsFromBases(ref baseType, interfaces);
@@ -49,30 +54,45 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				}
 			}
 			var namingScope = modulescope.NamingScope.SafeSubScope();
-			IList<string> cache = new List<string>();
+			SetGenericParameters(baseType, interfaces, namingScope, genericArguments);
+			TypeBuilder.SetParent(baseType);
+			moduleScope = modulescope;
+		}
+
+		private void SetGenericParameters(Type baseType, IEnumerable<Type> interfaces, INamingScope namingScope, Type[] genericArguments)
+		{
+			if(genericArguments!=null && genericArguments.Length>0)
+			{
+				DefineGenericParameters(Array.ConvertAll(genericArguments, a => new Pair<Type, string>(a, a.Name)));
+				return;
+			}
+			IList<Pair<Type, string>> cache = new List<Pair<Type, string>>();
 			CollectGenericParameters(baseType, namingScope,cache);
 			foreach (var @interface in interfaces)
 			{
 				CollectGenericParameters(@interface, namingScope,cache);
 			}
-			DefineGenericParameters(cache);
-			TypeBuilder.SetParent(baseType);
-			moduleScope = modulescope;
+			DefineGenericParameters(cache.ToArray());
 		}
 
-		private void DefineGenericParameters(IList<string> cache)
+		private void DefineGenericParameters(Pair<Type, string>[] types)
 		{
-			if (cache.Count == 0) return;
-			var arguments = TypeBuilder.DefineGenericParameters(cache.ToArray());
+			if (types.Length == 0) return;
+			var ownGenericParameters = TypeBuilder.DefineGenericParameters(Array.ConvertAll(types, t => t.Second));
+			genericParameters = new Dictionary<Type, Type>();
+			for (int i = 0; i < types.Length; i++)
+			{
+				genericParameters.Add(types[i].First, ownGenericParameters[i]);
+			}
 		}
 
-		private void CollectGenericParameters(Type type, INamingScope namingScope, IList<string> cache)
+		private void CollectGenericParameters(Type type, INamingScope namingScope, IList<Pair<Type,string>> cache)
 		{
-			if(type.IsGenericTypeDefinition == false) return;
+			if (type == null || type.IsGenericTypeDefinition == false) return;
 			var arguments = type.GetGenericArguments();
 			foreach (var argument in arguments)
 			{
-				cache.Add(namingScope.GetUniqueName(argument.Name));
+				cache.Add(new Pair<Type, string>(argument, namingScope.GetUniqueName(argument.Name)));
 			}
 		}
 
@@ -81,8 +101,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			get { return moduleScope; }
 		}
 
-		private static TypeBuilder CreateTypeBuilder(ModuleScope modulescope, string name, Type baseType, IEnumerable<Type> interfaces,
-		                                             TypeAttributes flags, bool forceUnsigned)
+		private static TypeBuilder CreateTypeBuilder(ModuleScope modulescope, string name, Type baseType, IEnumerable<Type> interfaces, TypeAttributes flags, bool forceUnsigned)
 		{
 			bool isAssemblySigned = !forceUnsigned && !StrongNameUtil.IsAnyTypeFromUnsignedAssembly(baseType, interfaces);
 			return modulescope.DefineType(isAssemblySigned, name, flags);
@@ -114,6 +133,29 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			}
 
 			return interfaces;
+		}
+
+		public Type[] GetOverridingGenericArguments(Type[] baseGenericArguments)
+		{
+			if(genericParameters == null)
+			{
+				throw new InvalidOperationException(
+					string.Format("Could not map generic arguments. Looks like type {0} is not generic.", TypeBuilder));
+			}
+			var types = new Type[baseGenericArguments.Length];
+			for (int i = 0; i < types.Length; i++)
+			{
+				try
+				{
+					types[i] = genericParameters[baseGenericArguments[i]];
+				}
+				catch (KeyNotFoundException e)
+				{
+					throw new ArgumentException(string.Format("Could not find generic argument on type {0} corresponding to {1}.",
+					                                          TypeBuilder, baseGenericArguments[i]), e);
+				}
+			}
+			return types;
 		}
 	}
 }

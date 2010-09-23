@@ -43,11 +43,10 @@ namespace Castle.DynamicProxy.Generators
 			this.contributor = contributor;
 		}
 
-		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class, ProxyGenerationOptions options, INamingScope namingScope)
+		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter proxy, ProxyGenerationOptions options, INamingScope namingScope)
 		{
 			var invocationType = invocation;
 
-			Trace.Assert(MethodToOverride.IsGenericMethod == invocationType.IsGenericTypeDefinition);
 			var genericArguments = Type.EmptyTypes;
 
 			var constructor = invocation.GetConstructors()[0];
@@ -66,18 +65,24 @@ namespace Castle.DynamicProxy.Generators
 			}
 			else
 			{
-				var proxiedMethodToken = @class.CreateStaticField(namingScope.GetUniqueName("token_" + MethodToOverride.Name),
+				if(invocationType.IsGenericTypeDefinition)
+				{
+					Debug.Assert(MethodToOverride.DeclaringType.IsGenericType);
+					invocationType.MakeGenericType(
+						proxy.GetOverridingGenericArguments(MethodToOverride.DeclaringType.GetGenericArguments()));
+				}
+				var proxiedMethodToken = proxy.CreateStaticField(namingScope.GetUniqueName("token_" + MethodToOverride.Name),
 																  typeof(MethodInfo));
-				@class.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(proxiedMethodToken,
+				proxy.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(proxiedMethodToken,
 																					 new MethodTokenExpression(MethodToOverride)));
 
 				proxiedMethodTokenExpression = proxiedMethodToken.ToExpression();
 			}
 
 			var dereferencedArguments = IndirectReference.WrapIfByRef(emitter.Arguments);
-			var arguments = GetCtorArguments(@class, namingScope, proxiedMethodTokenExpression,
+			var arguments = GetCtorArguments(proxy, namingScope, proxiedMethodTokenExpression,
 											   dereferencedArguments);
-			var ctorArguments = ModifyArguments(@class, arguments);
+			var ctorArguments = ModifyArguments(proxy, arguments);
 
 			var invocationLocal = emitter.CodeBuilder.DeclareLocal(invocationType);
 			emitter.CodeBuilder.AddStatement(new AssignStatement(invocationLocal,

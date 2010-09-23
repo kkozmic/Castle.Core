@@ -40,17 +40,16 @@ namespace Castle.DynamicProxy.Generators
 			this.contributor = contributor;
 		}
 
-		public AbstractTypeEmitter Generate(ClassEmitter @class, ProxyGenerationOptions options, INamingScope namingScope)
+		public AbstractTypeEmitter Generate(ClassEmitter proxy, ProxyGenerationOptions options, INamingScope namingScope)
 		{
 			var methodInfo = method.Method;
 
 			var interfaces = new Type[0];
-
 			if (canChangeTarget)
 			{
 				interfaces = new[] { typeof(IChangeProxyTarget) };
 			}
-			var invocation = GetEmitter(@class, interfaces, namingScope, methodInfo);
+			var invocation = GetEmitter(proxy, interfaces, namingScope, methodInfo);
 
 			// invocation only needs to mirror the generic parameters of the MethodInfo
 			// targetType cannot be a generic type definition (YET!)
@@ -61,7 +60,7 @@ namespace Castle.DynamicProxy.Generators
 			var targetField = GetTargetReference();
 			if (canChangeTarget)
 			{
-				ImplementChangeProxyTargetInterface(@class, invocation, targetField);
+				ImplementChangeProxyTargetInterface(proxy, invocation, targetField);
 			}
 
 			ImplemementInvokeMethodOnTarget(invocation, methodInfo.GetParameters(), targetField, callback);
@@ -100,7 +99,17 @@ namespace Castle.DynamicProxy.Generators
 			var suggestedName = string.Format("Castle.Proxies.Invocations.{0}_{1}", methodInfo.DeclaringType.Name,
 			                                  methodInfo.Name);
 			var uniqueName = namingScope.ParentScope.GetUniqueName(suggestedName);
-			return new ClassEmitter(@class.ModuleScope, uniqueName, GetBaseType(), interfaces);
+			return new ClassEmitter(@class.ModuleScope, uniqueName, GetBaseType(), interfaces,
+			                        GetGenericParameters(methodInfo.DeclaringType));
+		}
+
+		private Type[] GetGenericParameters(Type type)
+		{
+			if(type.IsGenericType)
+			{
+				return type.GetGenericArguments();
+			}
+			return Type.EmptyTypes;
 		}
 
 		protected abstract Type GetBaseType();
