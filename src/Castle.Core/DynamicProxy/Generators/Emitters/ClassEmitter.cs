@@ -162,7 +162,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		{
 			// TODO: this is temporary impl. revisit it.
 			Type type;
-			if(genericParameters.TryGetValue(genericArgument, out type))
+			if (genericParameters != null && genericParameters.TryGetValue(genericArgument, out type))
 			{
 				return type;
 			}

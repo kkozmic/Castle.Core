@@ -132,6 +132,7 @@
     <Compile Include="DynamicProxy.Tests\Classes\NonPublicMethodsClass.cs" />
     <Compile Include="DynamicProxy.Tests\Classes\ServiceClass.cs" />
     <Compile Include="ClassWithAttributesTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInvocationsTestCase.cs" />
     <Compile Include="GenClasses\ClassWithGenArgs.cs" />
     <Compile Include="GenClasses\ClassWithIndexer.cs" />
     <Compile Include="GenClasses\ClassWithMethodWithReturnArrayOfListOfT.cs" />

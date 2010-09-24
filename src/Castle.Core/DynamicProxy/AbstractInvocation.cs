@@ -11,10 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 namespace Castle.DynamicProxy
 {
 	using System;
 	using System.Diagnostics;
+	using System.Linq;
 	using System.Reflection;
 	using System.Runtime.Serialization;
 
@@ -213,8 +215,19 @@ namespace Castle.DynamicProxy
 		{
 			if (method.ContainsGenericParameters)
 			{
-				Debug.Assert(genericMethodArguments != null);
-				return method.GetGenericMethodDefinition().MakeGenericMethod(genericMethodArguments);
+				if(method.IsGenericMethod)
+				{
+					Debug.Assert(genericMethodArguments != null);
+					return method.GetGenericMethodDefinition().MakeGenericMethod(genericMethodArguments);
+				}
+				Debug.Assert(GetType().IsGenericType);
+				Debug.Assert(method.DeclaringType.IsGenericTypeDefinition);
+				var closedType = method.DeclaringType.MakeGenericType(GetType().GetGenericArguments());
+				// TODO: this is horrible implementation and it does not work. There has to be a better way.
+				var potentialMethods = closedType.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+				var methodInfo = potentialMethods.Where(m=>method.Name == m.Name).Single();
+				return methodInfo;
+
 			}
 			return method;
 		}
