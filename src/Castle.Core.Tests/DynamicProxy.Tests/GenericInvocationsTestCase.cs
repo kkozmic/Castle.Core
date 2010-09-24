@@ -40,7 +40,7 @@ namespace Castle.DynamicProxy.Tests
 		{
 			IInvocation invocation = null;
 			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethod<int>>(new WithCallbackInterceptor(i => invocation = i));
+				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodWithGenericParameter<int>>(new WithCallbackInterceptor(i => invocation = i));
 			proxy.DoStuff(4);
 
 			Assert.IsNotNull(invocation);

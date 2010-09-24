@@ -14,7 +14,7 @@
 
 namespace Castle.DynamicProxy.Tests.GenInterfaces
 {
-	public interface IGenericWithGenericMethod<T>
+	public interface IGenericWithMethodWithGenericParameter<T>
 	{
 		void DoStuff(T t);
 	}
