@@ -16,6 +16,7 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Diagnostics;
+	using System.Linq;
 	using System.Reflection;
 	using System.Reflection.Emit;
 #if !SILVERLIGHT
@@ -57,7 +58,9 @@ namespace Castle.DynamicProxy.Generators
 			{
 				// bind generic method arguments to invocation's type arguments
 				genericArguments = emitter.MethodBuilder.GetGenericArguments();
-				invocationType = invocationType.MakeGenericType(genericArguments);
+				var invocationGenericArguments = MethodToOverride.DeclaringType.GetGenericArguments()
+					.Concat(emitter.MethodBuilder.GetGenericArguments()).ToArray();
+				invocationType = invocationType.MakeGenericType(invocationGenericArguments);
 				constructor = TypeBuilder.GetConstructor(invocationType, constructor);
 
 				// Not in the cache: generic method

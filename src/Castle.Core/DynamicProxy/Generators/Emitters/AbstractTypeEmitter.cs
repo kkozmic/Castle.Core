@@ -30,21 +30,27 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		private readonly PropertiesCollection properties = new PropertiesCollection();
 		private readonly EventCollection events = new EventCollection();
 		private readonly NestedClassCollection nested = new NestedClassCollection();
-		private readonly Dictionary<String, GenericTypeParameterBuilder> name2GenericType = new Dictionary<String, GenericTypeParameterBuilder>();
 
 		private GenericTypeParameterBuilder[] genericTypeParams;
 
 		private readonly IDictionary<string, FieldReference> fields =
 			new Dictionary<string, FieldReference>(StringComparer.OrdinalIgnoreCase);
 
+		protected readonly Dictionary<Type, Type> genericParameters = new Dictionary<Type, Type>(4);
+
 		protected AbstractTypeEmitter(TypeBuilder typeBuilder)
 		{
 			typebuilder = typeBuilder;
 		}
 
-		public virtual Type GetGenericArgument(Type genericArgument)
+		public Type GetGenericArgument(Type genericArgument)
 		{
-			return name2GenericType[genericArgument.Name];
+			Type type;
+			if (genericParameters.TryGetValue(genericArgument, out type))
+			{
+				return type;
+			}
+			throw new ArgumentException(string.Format("There's no generic argument corresponding to {0}.", genericArgument));
 		}
 
 		public Type[] GetGenericArgumentsFor(Type genericType)
@@ -55,7 +61,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			{
 				if (genType.IsGenericParameter)
 				{
-					types.Add(name2GenericType[genType.Name]);
+					types.Add(GetGenericArgument(genType));
 				}
 				else
 				{
@@ -68,10 +74,10 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type[] GetGenericArgumentsFor(MethodInfo genericMethod)
 		{
-			List<Type> types = new List<Type>();
+			var types = new List<Type>();
 			foreach (Type genType in genericMethod.GetGenericArguments())
 			{
-				types.Add(name2GenericType[genType.Name]);
+				types.Add(GetGenericArgument(genType));
 			}
 
 			return types.ToArray();
@@ -262,17 +268,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		public void SetGenericTypeParameters(GenericTypeParameterBuilder[] genericTypeParameterBuilders)
 		{
 			genericTypeParams = genericTypeParameterBuilders;
-		}
-
-		public void CopyGenericParametersFromMethod(MethodInfo methodToCopyGenericsFrom)
-		{
-			// big sanity check
-			if (genericTypeParams != null)
-			{
-				throw new ProxyGenerationException("CopyGenericParametersFromMethod: cannot invoke me twice");
-			}
-
-			SetGenericTypeParameters(GenericUtil.CopyGenericArguments(methodToCopyGenericsFrom, typebuilder, name2GenericType));
 		}
 
 		public FieldReference GetField(string name)

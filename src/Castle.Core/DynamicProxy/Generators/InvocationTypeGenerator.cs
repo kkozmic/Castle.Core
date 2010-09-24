@@ -16,6 +16,7 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Reflection;
 
 	using Castle.DynamicProxy.Generators.Emitters;
@@ -49,11 +50,8 @@ namespace Castle.DynamicProxy.Generators
 			{
 				interfaces = new[] { typeof(IChangeProxyTarget) };
 			}
-			var invocation = GetEmitter(proxy, interfaces, namingScope, methodInfo);
 
-			// invocation only needs to mirror the generic parameters of the MethodInfo
-			// targetType cannot be a generic type definition (YET!)
-			invocation.CopyGenericParametersFromMethod(methodInfo);
+			var invocation = GetEmitter(proxy, interfaces, namingScope, methodInfo);
 
 			CreateConstructor(invocation, options);
 
@@ -100,16 +98,16 @@ namespace Castle.DynamicProxy.Generators
 			                                  methodInfo.Name);
 			var uniqueName = namingScope.ParentScope.GetUniqueName(suggestedName);
 			return new ClassEmitter(@class.ModuleScope, uniqueName, GetBaseType(), interfaces,
-			                        GetGenericParameters(methodInfo.DeclaringType));
+			                        GetGenericParameters(methodInfo.DeclaringType, methodInfo.GetGenericArguments()));
 		}
 
-		private Type[] GetGenericParameters(Type type)
+		private Type[] GetGenericParameters(Type type, Type[] methodArgs)
 		{
 			if(type.IsGenericType)
 			{
-				return type.GetGenericArguments();
+				return type.GetGenericArguments().Concat(methodArgs).ToArray();
 			}
-			return Type.EmptyTypes;
+			return methodArgs;
 		}
 
 		protected abstract Type GetBaseType();

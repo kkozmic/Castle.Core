@@ -101,10 +101,10 @@ namespace Castle.DynamicProxy.Contributors
 
 			var @delegate = new ClassEmitter(@class.ModuleScope,
 			                                 uniqueName,
-			                                 typeof (MulticastDelegate),
+			                                 typeof(MulticastDelegate),
 			                                 Type.EmptyTypes,
-			                                 DelegateFlags);
-			@delegate.CopyGenericParametersFromMethod(method.Method);
+			                                 DelegateFlags,
+			                                 method.Method.GetGenericArguments());
 			return @delegate;
 		}
 	}

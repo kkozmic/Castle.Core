@@ -27,7 +27,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	public class ClassEmitter : AbstractTypeEmitter
 	{
 		private readonly ModuleScope moduleScope;
-		private Dictionary<Type, Type> genericParameters;
 		private const TypeAttributes DefaultAttributes = TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Serializable;
 
 		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces, params Type[] genericArguments)
@@ -35,8 +34,8 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		{
 		}
 
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces, TypeAttributes flags)
-			: this(modulescope, name, baseType, interfaces, flags, ShouldForceUnsigned())
+		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces, TypeAttributes flags, params Type[] genericArguments)
+			: this(modulescope, name, baseType, interfaces, flags, ShouldForceUnsigned(), genericArguments)
 		{
 		}
 
@@ -79,7 +78,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		{
 			if (types.Length == 0) return;
 			var ownGenericParameters = TypeBuilder.DefineGenericParameters(Array.ConvertAll(types, t => t.Second));
-			genericParameters = new Dictionary<Type, Type>();
 			for (int i = 0; i < types.Length; i++)
 			{
 				genericParameters.Add(types[i].First, ownGenericParameters[i]);
@@ -137,11 +135,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type[] GetOverridingGenericArguments(Type[] baseGenericArguments)
 		{
-			if(genericParameters == null)
-			{
-				throw new InvalidOperationException(
-					string.Format("Could not map generic arguments. Looks like type {0} is not generic.", TypeBuilder));
-			}
 			var types = new Type[baseGenericArguments.Length];
 			for (int i = 0; i < types.Length; i++)
 			{
@@ -156,17 +149,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				}
 			}
 			return types;
-		}
-
-		public override Type GetGenericArgument(Type genericArgument)
-		{
-			// TODO: this is temporary impl. revisit it.
-			Type type;
-			if (genericParameters != null && genericParameters.TryGetValue(genericArgument, out type))
-			{
-				return type;
-			}
-			return base.GetGenericArgument(genericArgument);
 		}
 	}
 }
