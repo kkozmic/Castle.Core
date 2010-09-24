@@ -51,6 +51,21 @@ namespace Castle.DynamicProxy.Tests
 		}
 
 		[Test]
+		public void Proxy_for_inherited_closed_generic_type_is_NOT_generic()
+		{
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IEmptyGenericOfInt>();
+			Assert.IsFalse(proxy.GetType().IsGenericType);
+		}
+
+		[Test]
+		public void Proxy_for_inherited_semi_closed_double_generic_type_is_single_generic()
+		{
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IEmptyGenericOfInt<string>>();
+			Assert.IsTrue(proxy.GetType().IsGenericType);
+			Assert.AreEqual(1, proxy.GetType().GetGenericArguments().Length);
+		}
+
+		[Test]
 		public void Proxy_for_generic_type_with_generic_method_generates_correctly()
 		{
 			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethod<int>>();
