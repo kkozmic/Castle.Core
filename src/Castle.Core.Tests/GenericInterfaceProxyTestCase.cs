@@ -208,8 +208,8 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInGenIfcNongenMethodRefTypeNoTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
-			IGenInterfaceHierarchyBase<List<object>> proxy =
+			var interceptor = new KeepDataInterceptor();
+			var proxy =
 				generator.CreateInterfaceProxyWithoutTarget<IGenInterfaceHierarchyBase<List<object>>>(interceptor);
 
 			proxy.Get();

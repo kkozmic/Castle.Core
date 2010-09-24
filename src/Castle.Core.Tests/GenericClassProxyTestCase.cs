@@ -162,7 +162,7 @@ namespace Castle.DynamicProxy.Tests
 
 			int value1 = 10;
 
-			proxy.DoSomethingElse<string>(delegate(int param1) { return param1.ToString(); }, value1);
+			proxy.DoSomethingElse(param1 => param1.ToString(), value1);
 
 			Assert.IsTrue(proxy.Invoked);
 			Assert.AreEqual("10", proxy.SavedParam);
