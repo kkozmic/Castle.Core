@@ -157,5 +157,16 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			}
 			return types;
 		}
+
+		public override Type GetGenericArgument(Type genericArgument)
+		{
+			// TODO: this is temporary impl. revisit it.
+			Type type;
+			if(genericParameters.TryGetValue(genericArgument, out type))
+			{
+				return type;
+			}
+			return base.GetGenericArgument(genericArgument);
+		}
 	}
 }

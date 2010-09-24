@@ -25,12 +25,12 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	{
 		private const MethodAttributes defaultAttributes = MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Public;
 		private readonly TypeBuilder typebuilder;
-		private readonly ConstructorCollection constructors;
-		private readonly MethodCollection methods;
-		private readonly PropertiesCollection properties;
-		private readonly EventCollection events;
-		private readonly NestedClassCollection nested;
-		private readonly Dictionary<String, GenericTypeParameterBuilder> name2GenericType;
+		private readonly ConstructorCollection constructors = new ConstructorCollection();
+		private readonly MethodCollection methods = new MethodCollection();
+		private readonly PropertiesCollection properties = new PropertiesCollection();
+		private readonly EventCollection events = new EventCollection();
+		private readonly NestedClassCollection nested = new NestedClassCollection();
+		private readonly Dictionary<String, GenericTypeParameterBuilder> name2GenericType = new Dictionary<String, GenericTypeParameterBuilder>();
 
 		private GenericTypeParameterBuilder[] genericTypeParams;
 
@@ -40,17 +40,11 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		protected AbstractTypeEmitter(TypeBuilder typeBuilder)
 		{
 			typebuilder = typeBuilder;
-			nested = new NestedClassCollection();
-			methods = new MethodCollection();
-			constructors = new ConstructorCollection();
-			properties = new PropertiesCollection();
-			events = new EventCollection();
-			name2GenericType = new Dictionary<String, GenericTypeParameterBuilder>();
 		}
 
-		public Type GetGenericArgument(String genericArgumentName)
+		public virtual Type GetGenericArgument(Type genericArgument)
 		{
-			return name2GenericType[genericArgumentName];
+			return name2GenericType[genericArgument.Name];
 		}
 
 		public Type[] GetGenericArgumentsFor(Type genericType)
@@ -253,7 +247,9 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			get 
 			{
 				if (TypeBuilder.IsInterface)
+				{
 					throw new InvalidOperationException ("This emitter represents an interface; interfaces have no base types.");
+				}
 				return TypeBuilder.BaseType; 
 			}
 		}
@@ -265,10 +261,10 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public void SetGenericTypeParameters(GenericTypeParameterBuilder[] genericTypeParameterBuilders)
 		{
-			this.genericTypeParams = genericTypeParameterBuilders;
+			genericTypeParams = genericTypeParameterBuilders;
 		}
 
-		public void CopyGenericParametersFromMethod (MethodInfo methodToCopyGenericsFrom)
+		public void CopyGenericParametersFromMethod(MethodInfo methodToCopyGenericsFrom)
 		{
 			// big sanity check
 			if (genericTypeParams != null)

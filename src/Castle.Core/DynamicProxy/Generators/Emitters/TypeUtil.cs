@@ -86,7 +86,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 			if (parameter.IsGenericParameter)
 			{
-				return type.GetGenericArgument(parameter.Name);
+				return type.GetGenericArgument(parameter);
 			}
 
 			if (parameter.IsArray)
