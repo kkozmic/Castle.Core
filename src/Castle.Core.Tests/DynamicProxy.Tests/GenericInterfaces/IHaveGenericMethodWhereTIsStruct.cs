@@ -11,10 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-namespace Castle.DynamicProxy.Tests.InterClasses
+
+namespace Castle.DynamicProxy.Tests.GenericInterfaces
 {
-	public interface IGenericHaveGenericMethodWhereTToIsTFrom<TFrom>
+	public interface IHaveGenericMethodWhereTIsStruct
 	{
-		IHaveDoubleGenericMethodWhereTToIsTFrom RegisterType<TTo>() where TTo : TFrom;
+		void Execute<T>() where T : struct;
 	}
 }

@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.InterClasses
+namespace Castle.DynamicProxy.Tests.GenericInterfaces
 {
-	public interface IGenericTIsClass<T> where T : class
+	public interface IGenericTIsStruct<T> where T : struct
 	{
 	}
 }
