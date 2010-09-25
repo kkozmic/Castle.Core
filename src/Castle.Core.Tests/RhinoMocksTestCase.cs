@@ -332,9 +332,9 @@ namespace Castle.DynamicProxy.Tests
 		}
 	}
 
-	public interface IDoubleGeneric<One>
+	public interface IDoubleGeneric<TOne>
 	{
-		object Call<T>(One one, T two);
+		object Call<TTwo>(TOne one, TTwo two);
 	}
 
 	internal interface IInternal
