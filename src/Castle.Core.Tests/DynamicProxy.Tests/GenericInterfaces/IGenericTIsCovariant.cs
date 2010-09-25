@@ -16,5 +16,6 @@ namespace Castle.DynamicProxy.Tests.GenericInterfaces
 {
 	public interface IGenericTIsCovariant<out T>
 	{
+		void Execute();
 	}
 }

@@ -16,5 +16,6 @@ namespace Castle.DynamicProxy.Tests.GenericInterfaces
 {
 	public interface IGenericTIsNew<T> where T : new()
 	{
+		void Execute();
 	}
 }

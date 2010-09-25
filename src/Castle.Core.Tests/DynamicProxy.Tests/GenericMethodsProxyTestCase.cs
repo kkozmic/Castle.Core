@@ -34,14 +34,6 @@ namespace Castle.DynamicProxy.Tests
 		}
 
 		[Test]
-		public void Can_proxy_non_generic_type_with_generic_method_with_class_constraint()
-		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsClass>(new DoNothingInterceptor());
-
-			proxy.Execute<string>();
-		}
-
-		[Test]
 		public void Can_proxy_non_generic_type_with_double_generic_method_where_one_generic_arg_constraints_the_other()
 		{
 			var interceptor = new KeepDataInterceptor();

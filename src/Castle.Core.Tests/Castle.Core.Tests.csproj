@@ -137,6 +137,7 @@
     <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsIEmpty.cs" />
     <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsIEnumerableOfIEmpty.cs" />
     <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsOneAndITwo.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTOneIsTTwo.cs" />
     <Compile Include="DynamicProxy.Tests\GenericInvocationsTestCase.cs" />
     <Compile Include="GenClasses\ClassWithGenArgs.cs" />
     <Compile Include="GenClasses\ClassWithIndexer.cs" />

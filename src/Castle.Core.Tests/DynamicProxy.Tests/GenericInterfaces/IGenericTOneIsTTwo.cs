@@ -14,7 +14,7 @@
 
 namespace Castle.DynamicProxy.Tests.GenericInterfaces
 {
-	public interface IGenericTIsContravariant<in T>
+	public interface IGenericTOneIsTTwo<TOne, TTwo> where TOne : TTwo
 	{
 		void Execute();
 	}

@@ -18,5 +18,6 @@ namespace Castle.DynamicProxy.Tests.GenericInterfaces
 
 	public interface IGenericTIsOneAndITwo<T> where T : One, ITwo
 	{
+		void Execute();
 	}
 }

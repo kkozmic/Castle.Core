@@ -28,11 +28,16 @@ namespace Castle.DynamicProxy.Tests
 			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsOneAndITwo<SubOneTwo>>();
 		}
 
-
 		[Test]
 		public void Can_proxy_generic_type_with_generic_closed_over_simple_interface_constraint()
 		{
 			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsIEnumerableOfIEmpty<IList<Empty>>>();
+		}
+
+		[Test]
+		public void Can_proxy_double_generic_type_where_TOne_is_TTwo()
+		{
+			generator.CreateInterfaceProxyWithoutTarget<IGenericTOneIsTTwo<Empty, IEmpty>>();
 		}
 	}
 }
