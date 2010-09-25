@@ -77,6 +77,13 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			var argumentNames = GetArgumentNames(originalGenericArguments);
 			var newGenericParameters = genericParameterGenerator(argumentNames);
 
+			CopyGenericConstraints(methodToCopyGenericsFrom, originalGenericArguments, argumentNames, newGenericParameters, name2GenericType);
+
+			return newGenericParameters;
+		}
+
+		private static void CopyGenericConstraints(MethodInfo methodToCopyGenericsFrom, Type[] originalGenericArguments, string[] argumentNames, GenericTypeParameterBuilder[] newGenericParameters, Dictionary<string, GenericTypeParameterBuilder> name2GenericType)
+		{
 			for (int i = 0; i < newGenericParameters.Length; i++)
 			{
 				try
@@ -123,8 +130,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 				name2GenericType[argumentNames[i]] = newGenericParameters[i];
 			}
-
-			return newGenericParameters;
 		}
 
 		private static void CopyNonInheritableAttributes(GenericTypeParameterBuilder newGenericParameter, Type originalGenericArgument)

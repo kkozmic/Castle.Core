@@ -80,8 +80,28 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			var ownGenericParameters = TypeBuilder.DefineGenericParameters(Array.ConvertAll(types, t => t.Second));
 			for (int i = 0; i < types.Length; i++)
 			{
-				genericParameters.Add(types[i].First, ownGenericParameters[i]);
+				var baseParameter = types[i].First;
+				var ownParameter = ownGenericParameters[i];
+				CopyGenericConstraints(baseParameter, ownParameter);
+				genericParameters.Add(baseParameter, ownParameter);
 			}
+		}
+
+		private void CopyGenericConstraints(Type baseParameter, GenericTypeParameterBuilder ownParameter)
+		{
+			// TODO: this should be based on GenericUtil.CopyGenericConstraints
+			var attributes = baseParameter.GenericParameterAttributes;
+
+			attributes = ResetVariance(attributes);
+			ownParameter.SetGenericParameterAttributes(attributes);
+		}
+
+		private GenericParameterAttributes ResetVariance(GenericParameterAttributes attributes)
+		{
+			// we're building a class and only interfaces/delegates can have variance parameters
+			// so we need to reset it before we set it.
+			attributes &= ~GenericParameterAttributes.VarianceMask;
+			return attributes;
 		}
 
 		private void CollectGenericParameters(Type type, INamingScope namingScope, IList<Pair<Type,string>> cache)

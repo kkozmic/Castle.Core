@@ -144,6 +144,7 @@
     <Compile Include="GenClasses\OnlyGenMethodsClass.cs" />
     <Compile Include="GenerationHookTestCase.cs" />
     <Compile Include="GenericClassProxyTestCase.cs" />
+    <Compile Include="GenericConstraintsTestCase.cs" />
     <Compile Include="GenericInterfaceProxyTestCase.cs" />
     <Compile Include="DynamicProxy.Tests\GenericProxiesTestCase.cs" />
     <Compile Include="GenInterfaces\GenInterface.cs" />
@@ -162,6 +163,18 @@
     <Compile Include="Interceptors\LogInvocationInterceptor.cs" />
     <Compile Include="Interceptors\ThrowingInterceptor.cs" />
     <Compile Include="InterClasses\IExtendedService.cs" />
+    <Compile Include="InterClasses\IGenericHaveGenericMethodWhereTToIsTFrom.cs" />
+    <Compile Include="InterClasses\IGenericTIsClass.cs" />
+    <Compile Include="InterClasses\IGenericTIsClassAndNew.cs" />
+    <Compile Include="InterClasses\IGenericTIsClassAndNewAndCovariant.cs" />
+    <Compile Include="InterClasses\IGenericTIsContravariant.cs" />
+    <Compile Include="InterClasses\IGenericTIsCovariant.cs" />
+    <Compile Include="InterClasses\IGenericTIsNew.cs" />
+    <Compile Include="InterClasses\IGenericTIsStruct.cs" />
+    <Compile Include="InterClasses\IHaveGenericMethodWhereTIsClass.cs" />
+    <Compile Include="InterClasses\IHaveGenericMethodWhereTIsClassAndNew.cs" />
+    <Compile Include="InterClasses\IHaveGenericMethodWhereTIsNew.cs" />
+    <Compile Include="InterClasses\IHaveGenericMethodWhereTIsStruct.cs" />
     <Compile Include="InterClasses\IService.cs" />
     <Compile Include="InterClasses\ServiceImpl.cs" />
     <Compile Include="MethodsWithAttributesOnParametersTestCase.cs" />
