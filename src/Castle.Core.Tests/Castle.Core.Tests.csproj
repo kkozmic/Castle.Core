@@ -132,6 +132,11 @@
     <Compile Include="DynamicProxy.Tests\Classes\NonPublicMethodsClass.cs" />
     <Compile Include="DynamicProxy.Tests\Classes\ServiceClass.cs" />
     <Compile Include="ClassWithAttributesTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInheritanceConstraintsTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsEmpty.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsIEmpty.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsIEnumerableOfIEmpty.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsOneAndITwo.cs" />
     <Compile Include="DynamicProxy.Tests\GenericInvocationsTestCase.cs" />
     <Compile Include="GenClasses\ClassWithGenArgs.cs" />
     <Compile Include="GenClasses\ClassWithIndexer.cs" />
@@ -144,8 +149,8 @@
     <Compile Include="GenClasses\OnlyGenMethodsClass.cs" />
     <Compile Include="GenerationHookTestCase.cs" />
     <Compile Include="GenericClassProxyTestCase.cs" />
-    <Compile Include="GenericConstraintsTestCase.cs" />
-    <Compile Include="GenericInterfaceProxyTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericConstraintsTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericInterfaceProxyTestCase.cs" />
     <Compile Include="DynamicProxy.Tests\GenericProxiesTestCase.cs" />
     <Compile Include="GenInterfaces\GenInterface.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenericTypes.cs" />
@@ -177,6 +182,7 @@
     <Compile Include="DynamicProxy.Tests\GenericInterfaces\IHaveGenericMethodWhereTIsStruct.cs" />
     <Compile Include="InterClasses\IService.cs" />
     <Compile Include="InterClasses\ServiceImpl.cs" />
+    <Compile Include="Interfaces\SubOneTwo.cs" />
     <Compile Include="MethodsWithAttributesOnParametersTestCase.cs" />
     <Compile Include="MixinTestCase.cs" />
     <Compile Include="ThrowingInterceptorException.cs" />
@@ -261,7 +267,7 @@
     <Compile Include="GenClasses\ClassWithMethodWithArrayOfListOfT.cs" />
     <Compile Include="GenClasses\ClassWithMethodWithGenericOfGenericOfT.cs" />
     <Compile Include="GenClasses\MethodWithArgumentBeingArrayOfGenericTypeOfT.cs" />
-    <Compile Include="GenericMethodsProxyTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericMethodsProxyTestCase.cs" />
     <Compile Include="DictionarySerializationTestCase.cs" />
     <Compile Include="GenInterfaces\GenericMethodWhereOneGenParamInheritsTheOther.cs" />
     <Compile Include="InterClasses\IInterfaceWithGenericMethodWithDependentConstraint.cs" />

@@ -82,12 +82,34 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			{
 				var baseParameter = types[i].First;
 				var ownParameter = ownGenericParameters[i];
-				CopyGenericConstraints(baseParameter, ownParameter);
 				genericParameters.Add(baseParameter, ownParameter);
+			}
+			CopyGenericConstraints(genericParameters);
+		}
+
+		private void CopyGenericConstraints(Dictionary<Type, GenericTypeParameterBuilder> parameters)
+		{
+			foreach (var pair in parameters)
+			{
+				CopyGenericParameterAttributes(pair.Key, pair.Value);
+				var types = pair.Key.GetGenericParameterConstraints();
+#if SILVERLIGHT
+				Type[] interfacesConstraints = Castle.Core.Extensions.SilverlightExtensions.FindAll(types, delegate(Type type) { return type.IsInterface; });
+
+				Type baseClassConstraint = Castle.DynamicProxy.SilverlightExtensions.Extensions.Find(types, delegate(Type type) { return type.IsClass; });
+#else
+				var interfacesConstraints = Array.FindAll(types, type => type.IsInterface);
+				var baseClassConstraint = Array.Find(types, type => type.IsClass);
+#endif
+				if(baseClassConstraint!=null)
+				{
+					pair.Value.SetBaseTypeConstraint(baseClassConstraint);
+				}
+				pair.Value.SetInterfaceConstraints(interfacesConstraints);
 			}
 		}
 
-		private void CopyGenericConstraints(Type baseParameter, GenericTypeParameterBuilder ownParameter)
+		private void CopyGenericParameterAttributes(Type baseParameter, GenericTypeParameterBuilder ownParameter)
 		{
 			// TODO: this should be based on GenericUtil.CopyGenericConstraints
 			var attributes = baseParameter.GenericParameterAttributes;

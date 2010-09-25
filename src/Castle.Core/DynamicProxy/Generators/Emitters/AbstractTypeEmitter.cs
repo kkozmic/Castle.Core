@@ -17,6 +17,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using System;
 	using System.Collections.Generic;
 	using System.Diagnostics;
+	using System.Linq;
 	using System.Reflection;
 	using System.Reflection.Emit;
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
@@ -36,7 +37,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		private readonly IDictionary<string, FieldReference> fields =
 			new Dictionary<string, FieldReference>(StringComparer.OrdinalIgnoreCase);
 
-		protected readonly Dictionary<Type, Type> genericParameters = new Dictionary<Type, Type>(4);
+		protected readonly Dictionary<Type, GenericTypeParameterBuilder> genericParameters = new Dictionary<Type, GenericTypeParameterBuilder>(4);
 
 		protected AbstractTypeEmitter(TypeBuilder typeBuilder)
 		{
@@ -45,7 +46,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type GetGenericArgument(Type genericArgument)
 		{
-			Type type;
+			GenericTypeParameterBuilder type;
 			if (genericParameters.TryGetValue(genericArgument, out type))
 			{
 				return type;
@@ -74,13 +75,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type[] GetGenericArgumentsFor(MethodInfo genericMethod)
 		{
-			var types = new List<Type>();
-			foreach (Type genType in genericMethod.GetGenericArguments())
-			{
-				types.Add(GetGenericArgument(genType));
-			}
-
-			return types.ToArray();
+			return genericMethod.GetGenericArguments().Select(GetGenericArgument).ToArray();
 		}
 
 		public void AddCustomAttributes(ProxyGenerationOptions proxyGenerationOptions)
