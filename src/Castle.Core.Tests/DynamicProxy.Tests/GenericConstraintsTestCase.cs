@@ -14,61 +14,75 @@
 
 namespace Castle.DynamicProxy.Tests
 {
-	using Castle.DynamicProxy.Tests.GenericInterfaces;
 	using Castle.DynamicProxy.Tests.Interceptors;
+	using Castle.DynamicProxy.Tests.Interfaces;
 
 	using NUnit.Framework;
 
 	[TestFixture]
 	public class GenericConstraintsTestCase : BasePEVerifyTestCase
 	{
+		private DoNothingInterceptor noop;
+
 		[Test]
 		public void Can_proxy_generic_type_with_class_and_new_and_covariant_constraint()
 		{
-			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClassAndNewAndCovariant<object>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClassAndNewAndCovariant<object>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_generic_type_with_class_and_new_constraint()
 		{
-			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClassAndNew<object>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClassAndNew<object>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_generic_type_with_class_constraint()
 		{
-			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClass<string>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClass<string>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_generic_type_with_contravariant_constraint()
 		{
-			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsContravariant<object>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsContravariant<object>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_generic_type_with_covariant_constraint()
 		{
-			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsCovariant<object>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsCovariant<object>>(noop);
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_generic_type_with_new_constraint()
 		{
-			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsNew<int>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsNew<int>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_generic_type_with_struct_constraint()
 		{
-			generator.CreateInterfaceProxyWithoutTarget<IGenericTIsStruct<int>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsStruct<int>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_class_andnew_constraint()
 		{
-			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsClassAndNew>(new DoNothingInterceptor());
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsClassAndNew>(noop);
 
 			proxy.Execute<object>();
 		}
@@ -76,7 +90,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_class_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsClass>(new DoNothingInterceptor());
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsClass>(noop);
 
 			proxy.Execute<string>();
 		}
@@ -84,7 +98,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_new_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsNew>(new DoNothingInterceptor());
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsNew>(noop);
 
 			proxy.Execute<int>();
 			proxy.Execute<object>();
@@ -93,9 +107,15 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_struct_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsStruct>(new DoNothingInterceptor());
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsStruct>(noop);
 
 			proxy.Execute<int>();
+		}
+
+		[SetUp]
+		public void SetUp()
+		{
+			noop = new DoNothingInterceptor();
 		}
 	}
 }

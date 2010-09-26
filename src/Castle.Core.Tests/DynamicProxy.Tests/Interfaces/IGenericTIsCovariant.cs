@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.GenInterfaces
+namespace Castle.DynamicProxy.Tests.Interfaces
 {
-	public interface IGenericWithMethod<T, T1>
+	public interface IGenericTIsCovariant<out T>
 	{
-		void DoStuff();
+		void Execute();
 	}
 }

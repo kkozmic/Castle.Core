@@ -12,10 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.GenInterfaces
+namespace Castle.DynamicProxy.Tests.Interceptors
 {
-	public interface IGenericWithMethodWithGenericParameter<T>
+	using System;
+
+	public class CaptureInvocationInterceptor : IInterceptor
 	{
-		void DoStuff(T t);
+		private IInvocation local;
+
+		public IInvocation Invocation
+		{
+			get { return local; }
+		}
+
+		public void Intercept(IInvocation invocation)
+		{
+			if (local != null)
+			{
+				throw new NotSupportedException("This interceptor can only intercept one method. It's been called twice.");
+			}
+			local = invocation;
+		}
 	}
 }

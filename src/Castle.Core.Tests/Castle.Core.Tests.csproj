@@ -133,11 +133,12 @@
     <Compile Include="DynamicProxy.Tests\Classes\ServiceClass.cs" />
     <Compile Include="ClassWithAttributesTestCase.cs" />
     <Compile Include="DynamicProxy.Tests\GenericInheritanceConstraintsTestCase.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsEmpty.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsIEmpty.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsIEnumerableOfIEmpty.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsOneAndITwo.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTOneIsTTwo.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsEmpty.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsIEmpty.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsIEnumerableOfIEmpty.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsOneAndITwo.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTOneIsIEnumerableTTwo.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTOneIsTTwo.cs" />
     <Compile Include="DynamicProxy.Tests\GenericInvocationsTestCase.cs" />
     <Compile Include="GenClasses\ClassWithGenArgs.cs" />
     <Compile Include="GenClasses\ClassWithIndexer.cs" />
@@ -155,32 +156,33 @@
     <Compile Include="DynamicProxy.Tests\GenericProxiesTestCase.cs" />
     <Compile Include="GenInterfaces\GenInterface.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenericTypes.cs" />
-    <Compile Include="GenInterfaces\GenInterfaceWithGenMethods.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericWithGenericMethodUsingT.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethodsAndGenReturn.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethodsImpl.cs" />
-    <Compile Include="GenInterfaces\GenInterfaceWithGenMethodSimple.cs" />
-    <Compile Include="GenInterfaces\IEmptyGeneric.cs" />
-    <Compile Include="GenInterfaces\IEmptyGeneric2.cs" />
-    <Compile Include="GenInterfaces\IEmptyGenericOfInt.cs" />
-    <Compile Include="GenInterfaces\IEmptyGenericOfInt2.cs" />
-    <Compile Include="GenInterfaces\IGenericWithMethodWithGenericParameter.cs" />
-    <Compile Include="GenInterfaces\IGenericWithMethod.cs" />
-    <Compile Include="GenInterfaces\IGenericWithMethod2.cs" />
-    <Compile Include="Interceptors\LogInvocationInterceptor.cs" />
-    <Compile Include="Interceptors\ThrowingInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericWithGenericMethod.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGeneric.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGeneric2.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericOfInt.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericOfInt2.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericWithMethodUsingT.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericWithMethod.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericWithMethod2.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\CaptureInvocationInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\LogInvocationInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\ThrowingInterceptor.cs" />
     <Compile Include="InterClasses\IExtendedService.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericHaveGenericMethodWhereTToIsTFrom.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsClass.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsClassAndNew.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsClassAndNewAndCovariant.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsContravariant.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsCovariant.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsNew.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IGenericTIsStruct.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IHaveGenericMethodWhereTIsClass.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IHaveGenericMethodWhereTIsClassAndNew.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IHaveGenericMethodWhereTIsNew.cs" />
-    <Compile Include="DynamicProxy.Tests\GenericInterfaces\IHaveGenericMethodWhereTIsStruct.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericWithGenericMethodWhereTMethodIsTType.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsClass.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsClassAndNew.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsClassAndNewAndCovariant.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsContravariant.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsCovariant.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsNew.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsStruct.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IHaveGenericMethodWhereTIsClass.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IHaveGenericMethodWhereTIsClassAndNew.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IHaveGenericMethodWhereTIsNew.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IHaveGenericMethodWhereTIsStruct.cs" />
     <Compile Include="InterClasses\IService.cs" />
     <Compile Include="InterClasses\ServiceImpl.cs" />
     <Compile Include="Interfaces\SubOneTwo.cs" />
@@ -238,10 +240,10 @@
     <Compile Include="GenInterfaces\GenInterfaceWithMethodWithNestedGenericParameterByRef.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithMethodWithNestedGenericReturn.cs" />
     <Compile Include="IdEqualityHashCodeStrategy.cs" />
-    <Compile Include="Interceptors\AssertCanChangeTargetInterceptor.cs" />
-    <Compile Include="Interceptors\AssertCannotChangeTargetInterceptor.cs" />
-    <Compile Include="Interceptors\CallCountingInterceptor.cs" />
-    <Compile Include="Interceptors\AddTwoInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\AssertCanChangeTargetInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\AssertCannotChangeTargetInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\CallCountingInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\AddTwoInterceptor.cs" />
     <Compile Include="BaseTestCaseTestCase.cs" />
     <Compile Include="BasicInterfaceProxyWithoutTargetTestCase.cs" />
     <Compile Include="BugsReportedTestCase.cs" />
@@ -264,14 +266,14 @@
     <Compile Include="DynamicProxy.Tests\Classes\ClassOverridingEqualsAndGetHashCode.cs" />
     <Compile Include="DynamicProxy.Tests\Classes\ClassWithDefaultConstructor.cs" />
     <Compile Include="ClassProxyConstructorsTestCase.cs" />
-    <Compile Include="Interceptors\DoNothingInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\DoNothingInterceptor.cs" />
     <Compile Include="GenClasses\ClassWithMethodWithArrayOfListOfT.cs" />
     <Compile Include="GenClasses\ClassWithMethodWithGenericOfGenericOfT.cs" />
     <Compile Include="GenClasses\MethodWithArgumentBeingArrayOfGenericTypeOfT.cs" />
     <Compile Include="DynamicProxy.Tests\GenericMethodsProxyTestCase.cs" />
     <Compile Include="DictionarySerializationTestCase.cs" />
     <Compile Include="GenInterfaces\GenericMethodWhereOneGenParamInheritsTheOther.cs" />
-    <Compile Include="InterClasses\IInterfaceWithGenericMethodWithDependentConstraint.cs" />
+    <Compile Include="DynamicProxy.Tests\Interfaces\IHaveGenericMethodWhereTOneIsTTwo.cs" />
     <Compile Include="InheritedInterfacesTestCase.cs" />
     <Compile Include="InterceptorSelectorTestCase.cs" />
     <Compile Include="InterfaceProxyBaseTypeTestCase.cs" />
@@ -302,8 +304,8 @@
     <Compile Include="GenInterfaces\GenExplicitImplementation.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenArray.cs" />
     <Compile Include="GenInterfaces\OnlyGenMethodsInterface.cs" />
-    <Compile Include="Interceptors\ChangeTargetInterceptor.cs" />
-    <Compile Include="Interceptors\KeepDataInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\ChangeTargetInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\KeepDataInterceptor.cs" />
     <Compile Include="InterClasses\AlwaysThrowsServiceImpl.cs" />
     <Compile Include="InterClasses\ClassWithIndexer.cs" />
     <Compile Include="InterClasses\ClassWithMarkerInterface.cs" />
@@ -328,22 +330,22 @@
     <Compile Include="OrderOfInterfacePrecedenceTestCase.cs" />
     <Compile Include="OutRefParams.cs" />
     <Compile Include="PersistentProxyBuilderTestCase.cs" />
-    <Compile Include="Interceptors\ProceedOnTypeInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\ProceedOnTypeInterceptor.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ProxyGenerationOptionsTestCase.cs" />
-    <Compile Include="Interceptors\RequiredParamInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\RequiredParamInterceptor.cs" />
     <Compile Include="ProxyKind.cs" />
     <Compile Include="ProxyNothingHook.cs" />
     <Compile Include="ProxyTargetAccessorHandlingTestCase.cs" />
     <Compile Include="RhinoMocksTestCase.cs" />
     <Compile Include="SerializableClassTestCase.cs" />
     <Compile Include="InternalsVisibleTo.cs" />
-    <Compile Include="Interceptors\SetReturnValueInterceptor.cs" />
-    <Compile Include="Interceptors\WithCallbackInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\SetReturnValueInterceptor.cs" />
+    <Compile Include="DynamicProxy.Tests\Interceptors\WithCallbackInterceptor.cs" />
     <Compile Include="DynamicProxy.Tests\Classes\VirtuallyImplementsInterfaceWithProperty.cs" />
     <Compile Include="ConsoleLoggerTestCase.cs" />
     <Compile Include="DiagnosticsLoggerTestCase.cs" />
@@ -385,6 +387,9 @@
     <None Include="..\..\buildscripts\CastleKey.snk">
       <Link>CastleKey.snk</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DynamicProxy.Tests\GenericInterfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition="($(MSBuildTargets) == '') Or ($(MSBuildTargets) == 'CSharp')" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" Condition="$(MSBuildTargets) == 'Silverlight 3.0'" />
