@@ -87,18 +87,10 @@ namespace Castle.DynamicProxy.Tests
 			Assert.AreEqual(message, exception.Message);
 		}
 
-		[Test]
-		public void ProxyTypeThatInheritFromGenericType()
-		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IUserRepository>(new DoNothingInterceptor());
-			Assert.IsNotNull(proxy);
-		}
-
-		[Test]
+		[Test][Issue("DYNPROXY-51")]
 		public void DYNPROXY_51_GenericMarkerInterface()
 		{
-			WithMixin p =
-				(WithMixin) generator.CreateClassProxy(typeof (WithMixin), new Type[] {typeof (Marker<int>)}, new IInterceptor[0]);
+			var p = (WithMixin) generator.CreateClassProxy(typeof (WithMixin), new[] {typeof (Marker<int>)}, new IInterceptor[0]);
 			p.Method();
 		}
 

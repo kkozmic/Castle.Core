@@ -189,6 +189,7 @@
     <Compile Include="InterClasses\IService.cs" />
     <Compile Include="InterClasses\ServiceImpl.cs" />
     <Compile Include="Interfaces\SubOneTwo.cs" />
+    <Compile Include="IssueAttribute.cs" />
     <Compile Include="MethodsWithAttributesOnParametersTestCase.cs" />
     <Compile Include="MixinTestCase.cs" />
     <Compile Include="ThrowingInterceptorException.cs" />
