@@ -27,24 +27,27 @@ namespace Castle.DynamicProxy.Tests
 		private CaptureInvocationInterceptor interceptor;
 
 		[Test]
-		public void GenericType_generic_method_with_generic_parameter()
+		public void Invocation_Method_DeclaringType_is_closed_when_non_generic_method_using_T_on_generic_proxy()
 		{
-			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodUsingT<int>>(interceptor);
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodUsingT<int>>(interceptor);
+
 			proxy.Execute(4);
 
-			Assert.IsTrue(interceptor.Invocation.Method.GetParameters().Single().ParameterType.IsGenericParameter);
-			Assert.AreEqual(typeof(int), interceptor.Invocation.GetConcreteMethod().GetParameters().Single().ParameterType);
+			Assert.IsNotNull(interceptor.Invocation);
+			Assert.IsFalse(interceptor.Invocation.Method.DeclaringType.IsGenericTypeDefinition);
+			Assert.IsFalse(interceptor.Invocation.Method.GetParameters().Single().ParameterType.IsGenericParameter);
+			Assert.AreEqual(typeof(int), interceptor.Invocation.Method.GetParameters().Single().ParameterType);
 		}
 
 		[Test]
-		public void GenericType_non_generic_method()
+		public void Invocation_Method_DeclaringType_is_closed_when_non_generic_simple_method_on_generic_proxy()
 		{
-			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int>>(interceptor);
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int>>(interceptor);
+
 			proxy.Execute();
 
 			Assert.IsNotNull(interceptor.Invocation);
+			Assert.IsFalse(interceptor.Invocation.Method.DeclaringType.IsGenericTypeDefinition);
 		}
 
 		[SetUp]

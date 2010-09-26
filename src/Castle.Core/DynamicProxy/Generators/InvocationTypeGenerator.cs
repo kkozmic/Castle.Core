@@ -98,11 +98,13 @@ namespace Castle.DynamicProxy.Generators
 			                                  methodInfo.Name);
 			var uniqueName = namingScope.ParentScope.GetUniqueName(suggestedName);
 			return new ClassEmitter(@class.ModuleScope, uniqueName, GetBaseType(), interfaces,
-			                        GetGenericParameters(methodInfo.DeclaringType, methodInfo.GetGenericArguments()));
+			                        GetGenericParameters(methodInfo));
 		}
 
-		private Type[] GetGenericParameters(Type type, Type[] methodArgs)
+		private Type[] GetGenericParameters(MethodInfo method)
 		{
+			var type = method.DeclaringType;
+			var methodArgs = method.GetGenericArguments();
 			if(type.IsGenericType)
 			{
 				return type.GetGenericArguments().Concat(methodArgs).ToArray();

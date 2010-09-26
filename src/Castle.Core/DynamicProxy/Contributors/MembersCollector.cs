@@ -40,7 +40,14 @@ namespace Castle.DynamicProxy.Contributors
 
 		protected MembersCollector(Type type)
 		{
-			this.type = type;
+			if(type.IsGenericType)
+			{
+				this.type = type.GetGenericTypeDefinition();
+			}
+			else
+			{
+				this.type = type;
+			}
 		}
 
 		public ILogger Logger

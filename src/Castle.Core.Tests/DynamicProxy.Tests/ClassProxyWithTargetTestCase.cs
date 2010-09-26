@@ -19,6 +19,7 @@ namespace Castle.DynamicProxy.Tests
 	using System.Linq;
 	using System.Reflection;
 	using Castle.DynamicProxy.Tests.Classes;
+	using Castle.DynamicProxy.Tests.Hooks;
 	using Castle.DynamicProxy.Tests.Mixins;
 	using NUnit.Framework;
 

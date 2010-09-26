@@ -14,11 +14,8 @@
 
 namespace Castle.DynamicProxy.Tests
 {
-	using System;
-	using System.Collections.Generic;
-	using System.Reflection;
-
 	using Castle.DynamicProxy.Tests.Classes;
+	using Castle.DynamicProxy.Tests.Hooks;
 	using Castle.DynamicProxy.Tests.Interceptors;
 	using Castle.DynamicProxy.Tests.InterClasses;
 
@@ -67,65 +64,6 @@ namespace Castle.DynamicProxy.Tests
 			Assert.IsFalse(proxy.Valid);
 
 			Assert.AreEqual("Sum get_Valid ", logger.LogContents);
-		}
-	}
-
-#if !SILVERLIGHT
-	[Serializable]
-#endif
-	public class LogHook : IProxyGenerationHook
-	{
-		private readonly Type targetTypeToAssert;
-		private readonly bool screeningEnabled;
-		private IList<MemberInfo> nonVirtualMembers = new List<MemberInfo>();
-		private IList<MemberInfo> askedMembers = new List<MemberInfo>();
-		private bool completed;
-
-		public LogHook(Type targetTypeToAssert, bool screeningEnabled)
-		{
-			this.targetTypeToAssert = targetTypeToAssert;
-			this.screeningEnabled = screeningEnabled;
-		}
-
-		public IList<MemberInfo> NonVirtualMembers
-		{
-			get { return nonVirtualMembers; }
-		}
-
-		public IList<MemberInfo> AskedMembers
-		{
-			get { return askedMembers; }
-		}
-
-		public bool Completed
-		{
-			get { return completed; }
-		}
-
-		public bool ShouldInterceptMethod(Type type, MethodInfo memberInfo)
-		{
-			Assert.AreEqual(targetTypeToAssert, type);
-
-			askedMembers.Add(memberInfo);
-
-			if (screeningEnabled && memberInfo.Name.StartsWith("Sum"))
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-		public void NonProxyableMemberNotification(Type type, MemberInfo memberInfo)
-		{
-			Assert.AreEqual(targetTypeToAssert, type);
-
-			nonVirtualMembers.Add(memberInfo);
-		}
-
-		public void MethodsInspected()
-		{
-			completed = true;
 		}
 	}
 }

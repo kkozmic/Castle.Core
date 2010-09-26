@@ -133,6 +133,9 @@
     <Compile Include="DynamicProxy.Tests\Classes\ServiceClass.cs" />
     <Compile Include="ClassWithAttributesTestCase.cs" />
     <Compile Include="DynamicProxy.Tests\GenericInheritanceConstraintsTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\GenericProxyGenerationHookTestCase.cs" />
+    <Compile Include="DynamicProxy.Tests\Hooks\CaptureMembersHook.cs" />
+    <Compile Include="DynamicProxy.Tests\Hooks\LogHook.cs" />
     <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsEmpty.cs" />
     <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsIEmpty.cs" />
     <Compile Include="DynamicProxy.Tests\Interfaces\IGenericTIsIEnumerableOfIEmpty.cs" />
@@ -388,9 +391,7 @@
       <Link>CastleKey.snk</Link>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DynamicProxy.Tests\GenericInterfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" Condition="($(MSBuildTargets) == '') Or ($(MSBuildTargets) == 'CSharp')" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v3.0\Microsoft.Silverlight.CSharp.targets" Condition="$(MSBuildTargets) == 'Silverlight 3.0'" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight\v4.0\Microsoft.Silverlight.CSharp.targets" Condition="$(MSBuildTargets) == 'Silverlight 4.0'" />
