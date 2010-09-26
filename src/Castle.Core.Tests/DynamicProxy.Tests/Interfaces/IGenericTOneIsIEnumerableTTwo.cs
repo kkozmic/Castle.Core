@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.GenericInterfaces
+namespace Castle.DynamicProxy.Tests.Interfaces
 {
-	public interface IGenericTIsStruct<T> where T : struct
+	using System.Collections.Generic;
+
+	public interface IGenericTOneIsIEnumerableTTwo<TOne, TTwo> where TOne : IEnumerable<TTwo>
 	{
 		void Execute();
 	}

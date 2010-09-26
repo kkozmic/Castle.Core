@@ -1,4 +1,4 @@
-// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
+﻿// Copyright 2004-2010 Castle Project - http://www.castleproject.org/
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.GenInterfaces
+namespace Castle.DynamicProxy.Tests.Interfaces
 {
-	public interface GenInterfaceWithGenMethods<T>
+	public interface IGenericTIsIEmpty<T> where T : IEmpty
 	{
-		void DoSomething<Z>(Z z, T t);
+		void Execute();
 	}
 }

@@ -12,14 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.GenericInterfaces
+namespace Castle.DynamicProxy.Tests.Interfaces
 {
-	using System.Collections.Generic;
-
-	using Castle.DynamicProxy.Tests.Interfaces;
-
-	public interface IGenericTIsIEnumerableOfIEmpty<T> where T : IEnumerable<IEmpty>
+	public interface IHaveGenericMethodWhereTIsNew
 	{
-		void Execute();
+		void Execute<T>() where T : new();
 	}
 }

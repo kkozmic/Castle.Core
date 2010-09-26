@@ -15,11 +15,10 @@
 namespace Castle.DynamicProxy.Tests
 {
 	using Castle.DynamicProxy.Tests.GenClasses;
-	using Castle.DynamicProxy.Tests.GenericInterfaces;
 	using Castle.DynamicProxy.Tests.GenInterfaces;
 	using Castle.DynamicProxy.Tests.InterClasses;
 	using Castle.DynamicProxy.Tests.Interceptors;
-
+	using Castle.DynamicProxy.Tests.Interfaces;
 
 	using NUnit.Framework;
 
@@ -37,12 +36,12 @@ namespace Castle.DynamicProxy.Tests
 		public void Can_proxy_non_generic_type_with_double_generic_method_where_one_generic_arg_constraints_the_other()
 		{
 			var interceptor = new KeepDataInterceptor();
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveDoubleGenericMethodWhereTToIsTFrom>(
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTOneIsTTwo>(
 				interceptor);
 
-			proxy.RegisterType<object, string>();
+			proxy.Execute<object, string>();
 
-			var expectedMethod = typeof(IHaveDoubleGenericMethodWhereTToIsTFrom)
+			var expectedMethod = typeof(IHaveGenericMethodWhereTOneIsTTwo)
 				.GetMethod("RegisterType")
 				.MakeGenericMethod(typeof(object), typeof(string));
 
@@ -50,20 +49,21 @@ namespace Castle.DynamicProxy.Tests
 		}
 
 		[Test]
-		public void GenericMethod_WithConstraintOnSurroundingTypeParameter()
+		public void Can_proxy_generic_type_with_generic_method_where_TMethod_is_TType()
 		{
-			var interceptor = new KeepDataInterceptor();
+			IInvocation invocation = null;
+			var expectedMethod = typeof(IGenericWithGenericMethodWhereTMethodIsTType<object>)
+				.GetMethod("Execute").
+				MakeGenericMethod(typeof(string));
+
 			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenericHaveGenericMethodWhereTToIsTFrom<object>>(
-					interceptor);
+				generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethodWhereTMethodIsTType<object>>(
+					new WithCallbackInterceptor(i => invocation = i));
 
-			proxy.RegisterType<string>();
-
-			var expectedMethod =
-				typeof(IGenericHaveGenericMethodWhereTToIsTFrom<object>).GetMethod("RegisterType").
-					MakeGenericMethod(typeof(string));
-
-			Assert.AreEqual(expectedMethod, interceptor.Invocation.Method);
+			proxy.Execute<string>();
+			
+			Assert.IsNotNull(invocation);
+			Assert.AreEqual(expectedMethod, invocation.GetConcreteMethod());
 		}
 
 		[Test]

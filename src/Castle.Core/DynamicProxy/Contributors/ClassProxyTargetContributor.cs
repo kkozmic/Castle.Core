@@ -146,11 +146,12 @@ namespace Castle.DynamicProxy.Contributors
 				.Generate(@class, options, namingScope)
 				.BuildType();
 			return new MethodWithInvocationGenerator(method,
-			                                             @class.GetField("__interceptors"),
-			                                             invocation,
-			                                             (c, m) => new TypeTokenExpression(targetType),
-			                                             overrideMethod,
-			                                             contributor);
+			                                         @class.GetField("__interceptors"),
+			                                         invocation,
+			                                         (c, m) => new TypeTokenExpression(targetType),
+			                                         overrideMethod,
+			                                         contributor);
+
 		}
 
 		private IInvocationCreationContributor GetContributor(Type @delegate, MetaMethod method)

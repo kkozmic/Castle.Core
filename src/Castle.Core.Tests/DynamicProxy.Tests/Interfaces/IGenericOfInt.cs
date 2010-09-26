@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.GenInterfaces
+namespace Castle.DynamicProxy.Tests.Interfaces
 {
-	public interface GenInterfaceWithGenMethodSimple<T>
+	public interface IGenericOfInt : IGeneric<int>
 	{
-		void DoSomething<Z>(Z z);
 	}
 }

@@ -14,18 +14,21 @@
 
 namespace Castle.DynamicProxy.Tests
 {
-	using Castle.DynamicProxy.Tests.GenInterfaces;
 	using Castle.DynamicProxy.Tests.Interceptors;
+	using Castle.DynamicProxy.Tests.Interfaces;
 
 	using NUnit.Framework;
 
 	[TestFixture]
 	public class GenericProxiesTestCase : BasePEVerifyTestCase
 	{
+		private DoNothingInterceptor noop;
+
 		[Test]
 		public void Proxy_for_doublegeneric_type_is_generic()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IEmptyGeneric<int, string>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGeneric<int, string>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 		}
 
@@ -33,48 +36,55 @@ namespace Castle.DynamicProxy.Tests
 		public void Proxy_for_doublegeneric_type_with_method_generates_correctly()
 		{
 			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int, string>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 		}
 
 		[Test]
 		public void Proxy_for_doublegeneric_type_with_method_works_correctly()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int, string>>(new DoNothingInterceptor());
-			proxy.DoStuff();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int, string>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Proxy_for_generic_type_is_generic()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IEmptyGeneric<int>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGeneric<int>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 		}
 
 		[Test]
 		public void Proxy_for_generic_type_with_generic_method_generates_correctly()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<GenInterfaceWithGenMethods<int>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethodUsingT<int>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 		}
 
 		[Test]
 		public void Proxy_for_generic_type_with_generic_method_works_correctly()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<GenInterfaceWithGenMethods<int>>(new DoNothingInterceptor());
-			proxy.DoSomething("a", 5);
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethodUsingT<int>>(noop);
+
+			proxy.Execute("a", 5);
 		}
 
 		[Test]
 		public void Proxy_for_generic_type_with_method_generates_correctly()
 		{
 			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 		}
 
 		[Test]
 		public void Proxy_for_generic_type_with_method_with_generic_parameter_generates_correctly()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodWithGenericParameter<int>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodUsingT<int>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 		}
 
@@ -82,21 +92,24 @@ namespace Castle.DynamicProxy.Tests
 		public void Proxy_for_generic_type_with_method_with_generic_parameter_works_correctly()
 		{
 			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodWithGenericParameter<int>>(new DoNothingInterceptor());
-			proxy.DoStuff(2);
+				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodUsingT<int>>(noop);
+
+			proxy.Execute(2);
 		}
 
 		[Test]
 		public void Proxy_for_generic_type_with_method_works_correctly()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int>>(new DoNothingInterceptor());
-			proxy.DoStuff();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int>>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Proxy_for_generic_type_with_simple_generic_method_generates_correctly()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<GenInterfaceWithGenMethodSimple<int>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethod<int>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 		}
 
@@ -104,23 +117,48 @@ namespace Castle.DynamicProxy.Tests
 		public void Proxy_for_generic_type_with_simple_generic_method_works_correctly()
 		{
 			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<GenInterfaceWithGenMethodSimple<int>>(new DoNothingInterceptor());
-			proxy.DoSomething("a");
+				generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethod<int>>(noop);
+
+			proxy.Execute("a");
 		}
 
 		[Test]
 		public void Proxy_for_inherited_closed_generic_type_is_NOT_generic()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IEmptyGenericOfInt>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericOfInt>();
+
 			Assert.IsFalse(proxy.GetType().IsGenericType);
+		}
+
+		[Test]
+		public void Proxy_for_inherited_closed_generic_type_works_correctly()
+		{
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericOfInt>(noop);
+
+			proxy.Execute();
 		}
 
 		[Test]
 		public void Proxy_for_inherited_semi_closed_double_generic_type_is_single_generic()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IEmptyGenericOfInt<string>>();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericOfInt<string>>();
+
 			Assert.IsTrue(proxy.GetType().IsGenericType);
 			Assert.AreEqual(1, proxy.GetType().GetGenericArguments().Length);
+		}
+
+		[Test]
+		public void Proxy_for_inherited_semi_closed_double_generic_type_works_correctly()
+		{
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericOfInt<string>>();
+
+			proxy.Execute();
+		}
+
+		[SetUp]
+		public void SetUp()
+		{
+			noop = new DoNothingInterceptor();
 		}
 	}
 }

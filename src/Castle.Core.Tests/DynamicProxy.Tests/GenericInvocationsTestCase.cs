@@ -16,36 +16,41 @@ namespace Castle.DynamicProxy.Tests
 {
 	using System.Linq;
 
-	using Castle.DynamicProxy.Tests.GenInterfaces;
 	using Castle.DynamicProxy.Tests.Interceptors;
+	using Castle.DynamicProxy.Tests.Interfaces;
 
 	using NUnit.Framework;
 
 	[TestFixture]
 	public class GenericInvocationsTestCase : BasePEVerifyTestCase
 	{
-		[Test]
-		public void GenericType_non_generic_method()
-		{
-			IInvocation invocation = null;
-			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int>>(new WithCallbackInterceptor(i => invocation = i));
-			proxy.DoStuff();
-
-			Assert.IsNotNull(invocation);
-		}
+		private CaptureInvocationInterceptor interceptor;
 
 		[Test]
 		public void GenericType_generic_method_with_generic_parameter()
 		{
-			IInvocation invocation = null;
 			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodWithGenericParameter<int>>(new WithCallbackInterceptor(i => invocation = i));
-			proxy.DoStuff(4);
+				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethodUsingT<int>>(interceptor);
+			proxy.Execute(4);
 
-			Assert.IsNotNull(invocation);
-			Assert.IsTrue(invocation.Method.GetParameters().Single().ParameterType.IsGenericParameter);
-			Assert.AreEqual(typeof(int), invocation.GetConcreteMethod().GetParameters().Single().ParameterType);
+			Assert.IsTrue(interceptor.Invocation.Method.GetParameters().Single().ParameterType.IsGenericParameter);
+			Assert.AreEqual(typeof(int), interceptor.Invocation.GetConcreteMethod().GetParameters().Single().ParameterType);
+		}
+
+		[Test]
+		public void GenericType_non_generic_method()
+		{
+			var proxy =
+				generator.CreateInterfaceProxyWithoutTarget<IGenericWithMethod<int>>(interceptor);
+			proxy.Execute();
+
+			Assert.IsNotNull(interceptor.Invocation);
+		}
+
+		[SetUp]
+		public void SetUp()
+		{
+			interceptor = new CaptureInvocationInterceptor();
 		}
 	}
 }
