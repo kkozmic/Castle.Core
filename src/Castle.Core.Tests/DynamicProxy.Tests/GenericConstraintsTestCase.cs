@@ -22,12 +22,10 @@ namespace Castle.DynamicProxy.Tests
 	[TestFixture]
 	public class GenericConstraintsTestCase : BasePEVerifyTestCase
 	{
-		private DoNothingInterceptor noop;
-
 		[Test]
 		public void Can_proxy_generic_type_with_class_and_new_and_covariant_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClassAndNewAndCovariant<object>>(noop);
+			var proxy = Proxy<IGenericTIsClassAndNewAndCovariant<object>>();
 
 			proxy.Execute();
 		}
@@ -35,7 +33,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_generic_type_with_class_and_new_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClassAndNew<object>>(noop);
+			var proxy = Proxy<IGenericTIsClassAndNew<object>>();
 
 			proxy.Execute();
 		}
@@ -43,7 +41,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_generic_type_with_class_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsClass<string>>(noop);
+			var proxy = Proxy<IGenericTIsClass<string>>();
 
 			proxy.Execute();
 		}
@@ -51,7 +49,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_generic_type_with_contravariant_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsContravariant<object>>(noop);
+			var proxy = Proxy<IGenericTIsContravariant<object>>();
 
 			proxy.Execute();
 		}
@@ -59,14 +57,14 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_generic_type_with_covariant_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsCovariant<object>>(noop);
+			var proxy = Proxy<IGenericTIsCovariant<object>>();
 			proxy.Execute();
 		}
 
 		[Test]
 		public void Can_proxy_generic_type_with_new_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsNew<int>>(noop);
+			var proxy = Proxy<IGenericTIsNew<int>>();
 
 			proxy.Execute();
 		}
@@ -74,7 +72,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_generic_type_with_struct_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericTIsStruct<int>>(noop);
+			var proxy = Proxy<IGenericTIsStruct<int>>();
 
 			proxy.Execute();
 		}
@@ -82,7 +80,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_class_andnew_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsClassAndNew>(noop);
+			var proxy = Proxy<IHaveGenericMethodWhereTIsClassAndNew>();
 
 			proxy.Execute<object>();
 		}
@@ -90,7 +88,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_class_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsClass>(noop);
+			var proxy = Proxy<IHaveGenericMethodWhereTIsClass>();
 
 			proxy.Execute<string>();
 		}
@@ -98,7 +96,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_new_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsNew>(noop);
+			var proxy = Proxy<IHaveGenericMethodWhereTIsNew>();
 
 			proxy.Execute<int>();
 			proxy.Execute<object>();
@@ -107,15 +105,14 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Can_proxy_non_generic_type_with_generic_method_with_struct_constraint()
 		{
-			var proxy = generator.CreateInterfaceProxyWithoutTarget<IHaveGenericMethodWhereTIsStruct>(noop);
+			var proxy = Proxy<IHaveGenericMethodWhereTIsStruct>();
 
 			proxy.Execute<int>();
 		}
 
-		[SetUp]
-		public void SetUp()
+		private T Proxy<T>() where T : class
 		{
-			noop = new DoNothingInterceptor();
+			return generator.CreateInterfaceProxyWithoutTarget<T>(new DoNothingInterceptor());
 		}
 	}
 }
