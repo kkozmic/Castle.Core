@@ -34,9 +34,10 @@ namespace Castle.DynamicProxy.Tests
 			proxy.Execute(4);
 
 			Assert.IsNotNull(interceptor.Invocation);
-			Assert.IsFalse(interceptor.Invocation.Method.DeclaringType.IsGenericTypeDefinition);
-			Assert.IsFalse(interceptor.Invocation.Method.GetParameters().Single().ParameterType.IsGenericParameter);
-			Assert.AreEqual(typeof(int), interceptor.Invocation.Method.GetParameters().Single().ParameterType);
+			var method = interceptor.Invocation.Method;
+			Assert.IsFalse(method.DeclaringType.IsGenericTypeDefinition);
+			Assert.IsFalse(method.GetParameters().Single().ParameterType.IsGenericParameter);
+			Assert.AreEqual(typeof(int), method.GetParameters().Single().ParameterType);
 		}
 
 		[Test]
