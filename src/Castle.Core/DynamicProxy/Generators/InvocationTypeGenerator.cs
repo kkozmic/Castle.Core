@@ -302,7 +302,7 @@ namespace Castle.DynamicProxy.Generators
 				return callbackMethod;
 			}
 
-			return callbackMethod.MakeGenericMethod(invocation.GetGenericArgumentsFor(callbackMethod));
+			return callbackMethod.MakeGenericMethod(invocation.GetGenericArgumentsFor(method.MethodOnTarget));
 		}
 	}
 }

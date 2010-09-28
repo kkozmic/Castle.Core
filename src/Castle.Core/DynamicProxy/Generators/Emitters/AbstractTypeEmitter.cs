@@ -46,6 +46,8 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type GetGenericArgument(Type genericArgument)
 		{
+			Debug.Assert((genericArgument is GenericTypeParameterBuilder) == false,
+			             "(genericArgument is GenericTypeParameterBuilder) == false");
 			Type type;
 			if (genericParameters.TryGetValue(genericArgument, out type))
 			{
