@@ -19,8 +19,6 @@ namespace Castle.DynamicProxy.Tests
 #if !SILVERLIGHT
 	using System.Data;
 #endif
-	using System.Linq;
-	using System.Runtime.CompilerServices;
 	using System.Runtime.InteropServices;
 	using Castle.DynamicProxy.Tests.Interceptors;
 	using Castle.DynamicProxy.Tests.Interfaces;

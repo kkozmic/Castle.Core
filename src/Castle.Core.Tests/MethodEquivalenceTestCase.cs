@@ -19,19 +19,17 @@ namespace Castle.DynamicProxy.Tests
 	using NUnit.Framework;
 
 	[TestFixture]
-	public class MethodEquivalenceTestCase
+	public class MethodEquivalenceTestCase:BasePEVerifyTestCase
 	{
 		[Test]
-		public void CanProxyTypesWithMethodsOnlyDifferentByGenericArguments()
+		public void CanProxyTypesWithMethodsOnlyDifferentByGenericArg()
 		{
-			ProxyGenerator generator = new ProxyGenerator();
-
 			IMyService target1 = (IMyService)generator.CreateInterfaceProxyWithTarget(
 				typeof(IMyService), new MyServiceImpl(), new StandardInterceptor());
 			Assert.IsNotNull(target1.CreateSomething<int>("aa"));
 
 			IMyService target2 = (IMyService)generator.CreateClassProxy(
-                typeof(MyServiceImpl), new StandardInterceptor());
+				typeof(MyServiceImpl), new StandardInterceptor());
 			Assert.IsNotNull(target2.CreateSomething<int>("aa"));
 		}
 	}
