@@ -53,7 +53,9 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			{
 				return type;
 			}
-			throw new ArgumentException(string.Format("There's no generic argument corresponding to {0}.", genericArgument));
+			throw new ArgumentException(string.Format("There's no generic argument corresponding to {0} (declared on {1}).",
+			                                          genericArgument,
+			                                          (object)genericArgument.DeclaringMethod ?? genericArgument.DeclaringType));
 		}
 
 		public Type[] GetGenericArgumentsFor(Type genericType)
