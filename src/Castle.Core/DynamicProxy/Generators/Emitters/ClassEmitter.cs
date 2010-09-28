@@ -215,7 +215,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			{
 				try
 				{
-					types[i] = genericParameters[baseGenericArguments[i]];
+					types[i] = GetGenericArgument(baseGenericArguments[i]);
 				}
 				catch (KeyNotFoundException e)
 				{

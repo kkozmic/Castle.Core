@@ -15,6 +15,7 @@
 namespace Castle.DynamicProxy.Generators.Emitters
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Diagnostics;
 	using System.Reflection;
 	using System.Reflection.Emit;
@@ -56,7 +57,8 @@ namespace Castle.DynamicProxy.Generators.Emitters
 							   MethodAttributes attributes, MethodInfo methodToUseAsATemplate)
 			: this(owner, name, attributes)
 		{
-			var name2GenericType = GenericUtil.GetGenericArgumentsMap(owner);
+			// NOTE: This does not really work anymore
+			var name2GenericType = new Dictionary<string, GenericTypeParameterBuilder>();
 
 			var returnType = GenericUtil.ExtractCorrectType(methodToUseAsATemplate.ReturnType, name2GenericType);
 			var baseMethodParameters = methodToUseAsATemplate.GetParameters();

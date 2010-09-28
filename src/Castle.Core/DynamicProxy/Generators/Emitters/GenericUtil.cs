@@ -28,20 +28,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 	internal class GenericUtil
 	{
-		public static Dictionary<string, GenericTypeParameterBuilder> GetGenericArgumentsMap(AbstractTypeEmitter parentEmitter)
-		{
-			if (parentEmitter.GenericTypeParams == null || parentEmitter.GenericTypeParams.Length == 0)
-			{
-				return new Dictionary<string, GenericTypeParameterBuilder>(0);
-			}
-
-			var name2GenericType = new Dictionary<string, GenericTypeParameterBuilder>(parentEmitter.GenericTypeParams.Length);
-			foreach (var genType in parentEmitter.GenericTypeParams)
-			{
-				name2GenericType.Add(genType.Name, genType);
-			}
-			return name2GenericType;
-		}
 
 		public static GenericTypeParameterBuilder[] CopyGenericArguments(
 			MethodInfo methodToCopyGenericsFrom,

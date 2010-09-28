@@ -16,6 +16,7 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Reflection;
 	using System.Xml.Serialization;
 	using Castle.DynamicProxy.Contributors;
@@ -25,8 +26,15 @@ namespace Castle.DynamicProxy.Generators
 
 	public class DelegateProxyGenerator : BaseProxyGenerator
 	{
+		private Type[] generitArguments;
+
 		public DelegateProxyGenerator(ModuleScope scope, Type delegateType) : base(scope, delegateType)
 		{
+			if (targetType.IsGenericType)
+			{
+				generitArguments = targetType.GetGenericArguments();
+				targetType = targetType.GetGenericTypeDefinition();
+			}
 			ProxyGenerationOptions = new ProxyGenerationOptions(new DelegateProxyGenerationHook());
 			ProxyGenerationOptions.Initialize();
 		}
@@ -34,9 +42,21 @@ namespace Castle.DynamicProxy.Generators
 		public Type GetProxyType()
 		{
 			var cacheKey = new CacheKey(targetType, null, null);
-			return ObtainProxyType(cacheKey, GenerateType);
+			var proxyType = ObtainProxyType(cacheKey, GenerateType);
+			if(proxyType.IsGenericTypeDefinition)
+			{
+				Debug.Assert(generitArguments != null && generitArguments.Length > 0);
+				proxyType = proxyType.MakeGenericType(generitArguments);
+				InitializeStaticFields(proxyType);
+			}
+
+			return proxyType;
 		}
 
+		protected override ClassEmitter BuildClassEmitter(string typeName, Type parentType, IEnumerable<Type> interfaces)
+		{
+			return new ClassEmitter(Scope, typeName, parentType, interfaces, targetType.GetGenericArguments());
+		}
 
 		private Type GenerateType(string name, INamingScope namingScope)
 		{

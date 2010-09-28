@@ -32,8 +32,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		private readonly EventCollection events = new EventCollection();
 		private readonly NestedClassCollection nested = new NestedClassCollection();
 
-		private GenericTypeParameterBuilder[] genericTypeParams;
-
 		private readonly IDictionary<string, FieldReference> fields =
 			new Dictionary<string, FieldReference>(StringComparer.OrdinalIgnoreCase);
 
@@ -60,9 +58,9 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type[] GetGenericArgumentsFor(Type genericType)
 		{
-			List<Type> types = new List<Type>();
+			var types = new List<Type>();
 
-			foreach (Type genType in genericType.GetGenericArguments())
+			foreach (var genType in genericType.GetGenericArguments())
 			{
 				if (genType.IsGenericParameter)
 				{
@@ -231,12 +229,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			fieldbuilder.SetCustomAttribute(customAttributeBuilder);
 		}
 
-
-		public ConstructorCollection Constructors
-		{
-			get { return constructors; }
-		}
-
 		public NestedClassCollection Nested
 		{
 			get { return nested; }
@@ -257,16 +249,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				}
 				return TypeBuilder.BaseType; 
 			}
-		}
-
-		public GenericTypeParameterBuilder[] GenericTypeParams
-		{
-			get { return genericTypeParams; }
-		}
-
-		public void SetGenericTypeParameters(GenericTypeParameterBuilder[] genericTypeParameterBuilders)
-		{
-			genericTypeParams = genericTypeParameterBuilders;
 		}
 
 		public FieldReference GetField(string name)
