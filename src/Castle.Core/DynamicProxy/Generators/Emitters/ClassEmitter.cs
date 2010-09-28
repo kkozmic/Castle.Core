@@ -62,36 +62,54 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		{
 			if(genericArguments!=null && genericArguments.Length>0)
 			{
-				DefineGenericParameters(Array.ConvertAll(genericArguments, a => new Pair<Type, string>(a, a.Name)));
+				DefineGenericParameters(genericParameters,
+				                        genericArguments,
+				                        namingScope);
 				return;
 			}
-			IList<Pair<Type, string>> cache = new List<Pair<Type, string>>();
-			CollectGenericParameters(baseType, namingScope,cache);
+			CollectGenericParameters(baseType, genericParameters);
 			foreach (var @interface in interfaces)
 			{
-				CollectGenericParameters(@interface, namingScope,cache);
+				CollectGenericParameters(@interface, genericParameters);
 			}
-			DefineGenericParameters(cache.ToArray());
+			DefineGenericParameters(genericParameters, namingScope);
 		}
 
-		private void DefineGenericParameters(Pair<Type, string>[] types)
+		private void DefineGenericParameters(IDictionary<Type, Type> cache, INamingScope namingScope)
 		{
-			if (types.Length == 0) return;
-			var ownGenericParameters = TypeBuilder.DefineGenericParameters(Array.ConvertAll(types, t => t.Second));
-			for (int i = 0; i < types.Length; i++)
-			{
-				var baseParameter = types[i].First;
-				var ownParameter = ownGenericParameters[i];
-				genericParameters.Add(baseParameter, ownParameter);
-			}
-			CopyGenericConstraints(genericParameters);
+			var genericDefinitions = cache.Where(c => c.Value == null).Select(c => c.Key).ToArray();
+			DefineGenericParameters(cache, genericDefinitions, namingScope);
 		}
 
-		private void CopyGenericConstraints(Dictionary<Type, GenericTypeParameterBuilder> parameters)
+		private void DefineGenericParameters(IDictionary<Type, Type> cache, Type[] genericDefinitions, INamingScope namingScope)
+		{
+			var newGenerics = genericDefinitions.Select(c => new Pair<Type, string>(c, namingScope.GetUniqueName(c.Name))).ToArray();
+			var builders = DefineGenericParameters(newGenerics);
+			for (var i = 0; i < builders.Length; i++)
+			{
+				cache[newGenerics[i].First] = builders[i];
+			}
+
+			CopyGenericConstraints(cache);
+		}
+
+		private GenericTypeParameterBuilder[] DefineGenericParameters(Pair<Type, string>[] types)
+		{
+			if (types.Length == 0) return new GenericTypeParameterBuilder[0];
+			var ownGenericParameters = TypeBuilder.DefineGenericParameters(Array.ConvertAll(types, t => t.Second));
+			return ownGenericParameters;
+		}
+
+		private void CopyGenericConstraints(IDictionary<Type, Type> parameters)
 		{
 			foreach (var pair in parameters)
 			{
-				CopyGenericParameterAttributes(pair.Key, pair.Value);
+				var parameter = pair.Value as GenericTypeParameterBuilder;
+				if(parameter == null)
+				{
+					continue;
+				}
+				CopyGenericParameterAttributes(pair.Key, parameter);
 				var types = pair.Key.GetGenericParameterConstraints();
 #if SILVERLIGHT
 				Type[] interfacesConstraints = Castle.Core.Extensions.SilverlightExtensions.FindAll(types, delegate(Type type) { return type.IsInterface; });
@@ -103,9 +121,9 @@ namespace Castle.DynamicProxy.Generators.Emitters
 #endif
 				if(baseClassConstraint!=null)
 				{
-					pair.Value.SetBaseTypeConstraint(baseClassConstraint);
+					parameter.SetBaseTypeConstraint(baseClassConstraint);
 				}
-				pair.Value.SetInterfaceConstraints(interfacesConstraints);
+				parameter.SetInterfaceConstraints(interfacesConstraints);
 			}
 		}
 
@@ -126,13 +144,28 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			return attributes;
 		}
 
-		private void CollectGenericParameters(Type type, INamingScope namingScope, IList<Pair<Type,string>> cache)
+		private void CollectGenericParameters(Type type, IDictionary<Type, Type> cache)
 		{
-			if (type == null || type.IsGenericTypeDefinition == false) return;
-			var arguments = type.GetGenericArguments();
-			foreach (var argument in arguments)
+			if (type == null) return;
+
+			if (type.IsGenericTypeDefinition)
 			{
-				cache.Add(new Pair<Type, string>(argument, namingScope.GetUniqueName(argument.Name)));
+				var arguments = type.GetGenericArguments();
+				foreach (var argument in arguments)
+				{
+					cache.Add(argument, null);// we use null for now... to be replaced with actual value later
+				}
+				return;
+			}
+			if(type.IsGenericType)
+			{
+				var actual = type.GetGenericArguments();
+				var definitions = type.GetGenericTypeDefinition().GetGenericArguments();
+				for (var i = 0; i < actual.Length; i++)
+				{
+					cache.Add(definitions[i], actual[i]);
+				}
+				return;
 			}
 		}
 

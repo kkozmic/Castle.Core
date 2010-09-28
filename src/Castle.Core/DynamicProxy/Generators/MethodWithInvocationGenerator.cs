@@ -71,8 +71,27 @@ namespace Castle.DynamicProxy.Generators
 				if(invocationType.IsGenericTypeDefinition)
 				{
 					Debug.Assert(MethodToOverride.DeclaringType.IsGenericType);
-					invocationType.MakeGenericType(
-						proxy.GetOverridingGenericArguments(MethodToOverride.DeclaringType.GetGenericArguments()));
+					var typeArguments = proxy.GetOverridingGenericArguments(MethodToOverride.DeclaringType.GetGenericArguments());
+					invocationType = invocationType.MakeGenericType(typeArguments);
+					if(typeArguments.All(t=>t.IsGenericParameter))
+					{
+						constructor = TypeBuilder.GetConstructor(invocationType, constructor);
+					}
+					else
+					{
+						constructor = invocationType.GetConstructors()[0];
+					}
+					var actualBaseType = MethodToOverride.DeclaringType.GetGenericTypeDefinition().MakeGenericType(typeArguments);
+
+					// TODO: this is obviously anything BUT production quality code.
+					if (typeArguments.All(t => t.IsGenericParameter))
+					{
+						SetClosedMethodToOverride(TypeBuilder.GetMethod(actualBaseType, MethodToOverride));
+					}
+					else
+					{
+						SetClosedMethodToOverride(actualBaseType.GetMethod(MethodToOverride.Name));
+					}
 				}
 				var proxiedMethodToken = proxy.CreateStaticField(namingScope.GetUniqueName("token_" + MethodToOverride.Name),
 																  typeof(MethodInfo));

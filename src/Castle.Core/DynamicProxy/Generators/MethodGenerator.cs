@@ -21,14 +21,9 @@ namespace Castle.DynamicProxy.Generators
 
 	public abstract class MethodGenerator : IGenerator<MethodEmitter>
 	{
-		protected MethodInfo MethodToOverride
-		{
-			get { return method.Method; }
-		}
-		protected MethodInfo MethodOnTarget
-		{
-			get { return method.MethodOnTarget; }
-		}
+		private readonly MetaMethod method;
+		private readonly OverrideMethodDelegate overrideMethod;
+		private MethodInfo methodToOverride;
 
 		protected MethodGenerator(MetaMethod method, OverrideMethodDelegate overrideMethod)
 		{
@@ -36,8 +31,13 @@ namespace Castle.DynamicProxy.Generators
 			this.overrideMethod = overrideMethod;
 		}
 
-		private readonly MetaMethod method;
-		private readonly OverrideMethodDelegate overrideMethod;
+		protected MethodInfo MethodToOverride
+		{
+			get { return methodToOverride ?? method.Method; }
+		}
+
+		protected abstract MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter proxy,
+		                                                        ProxyGenerationOptions options, INamingScope namingScope);
 
 		public MethodEmitter Generate(ClassEmitter proxy, ProxyGenerationOptions options, INamingScope namingScope)
 		{
@@ -52,6 +52,9 @@ namespace Castle.DynamicProxy.Generators
 			return proxiedMethod;
 		}
 
-		protected abstract MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter proxy, ProxyGenerationOptions options, INamingScope namingScope);
+		protected void SetClosedMethodToOverride(MethodInfo methodToOverride)
+		{
+			this.methodToOverride = methodToOverride;
+		}
 	}
 }

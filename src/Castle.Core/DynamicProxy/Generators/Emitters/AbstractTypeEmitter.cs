@@ -37,7 +37,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		private readonly IDictionary<string, FieldReference> fields =
 			new Dictionary<string, FieldReference>(StringComparer.OrdinalIgnoreCase);
 
-		protected readonly Dictionary<Type, GenericTypeParameterBuilder> genericParameters = new Dictionary<Type, GenericTypeParameterBuilder>(4);
+		protected readonly Dictionary<Type, Type> genericParameters = new Dictionary<Type, Type>(4);
 
 		protected AbstractTypeEmitter(TypeBuilder typeBuilder)
 		{
@@ -46,7 +46,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type GetGenericArgument(Type genericArgument)
 		{
-			GenericTypeParameterBuilder type;
+			Type type;
 			if (genericParameters.TryGetValue(genericArgument, out type))
 			{
 				return type;
