@@ -30,8 +30,7 @@ namespace Castle.DynamicProxy.Tests
 			var service = (IService)
 			              generator.CreateInterfaceProxyWithoutTarget(
 			              	typeof (IService), new StandardInterceptor());
-			var exception = (NotImplementedException) Assert.Throws(typeof (NotImplementedException), () =>
-			                                                                                          service.Sum(1, 2));
+			var exception = Assert.Throws<NotImplementedException>(() => service.Sum(1, 2));
 
 			Assert.AreEqual(
 				"This is a DynamicProxy2 error: The interceptor attempted to 'Proceed' for method 'Int32 Sum(Int32, Int32)' which has no target. " +
