@@ -15,15 +15,15 @@
 namespace Castle.DynamicProxy.Tests
 {
 	using System;
+	using System.Collections.Generic;
 	using System.Reflection;
+
 	using Castle.DynamicProxy.Generators;
 	using Castle.DynamicProxy.Tests.GenInterfaces;
 	using Castle.DynamicProxy.Tests.Interceptors;
 	using Castle.DynamicProxy.Tests.Interfaces;
 
 	using NUnit.Framework;
-	using System.Collections.Generic;
-
 
 	[TestFixture]
 	public class GenericInterfaceProxyTestCase : BasePEVerifyTestCase
@@ -39,7 +39,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void ProxyWithGenericArgument()
 		{
-			GenInterface<int> proxy =
+			var proxy =
 				generator.CreateInterfaceProxyWithTarget<GenInterface<int>>(
 					new GenInterfaceImpl<int>(), logger);
 
@@ -66,7 +66,7 @@ namespace Castle.DynamicProxy.Tests
 			var proxy =
 				generator.CreateInterfaceProxyWithoutTarget<GenInterfaceWithMethodWithNestedGenericParameterByRef>(interceptors);
 			IEnumerable<IComparable<int>> param = null;
-			proxy.Foo<int>(ref param);
+			proxy.Foo(ref param);
 		}
 
 		[Test]
@@ -78,18 +78,16 @@ namespace Castle.DynamicProxy.Tests
 			proxy.Foo<int>();
 		}
 
-#if !MONO
-
 		[Test]
 		public void ProxyWithGenericArgumentAndGenericMethod()
 		{
-			IGenericWithGenericMethodUsingT<int> proxy =
+			var proxy =
 				generator.CreateInterfaceProxyWithTarget<IGenericWithGenericMethodUsingT<int>>(
 					new GenericWithGenericMethodUsingTImpl<int>(), logger);
 
 			Assert.IsNotNull(proxy);
 
-			proxy.Execute<long>(10L, 1);
+			proxy.Execute(10L, 1);
 
 			Assert.AreEqual("DoSomething ", logger.LogContents);
 		}
@@ -97,13 +95,13 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void ProxyWithGenericArgumentAndGenericMethodAndGenericReturn()
 		{
-			GenInterfaceWithGenMethodsAndGenReturn<int> proxy =
+			var proxy =
 				generator.CreateInterfaceProxyWithTarget<GenInterfaceWithGenMethodsAndGenReturn<int>>(
 					new GenInterfaceWithGenMethodsAndGenReturnImpl<int>(), logger);
 
 			Assert.IsNotNull(proxy);
 
-			Assert.AreEqual(10L, proxy.DoSomething<long>(10L, 1));
+			Assert.AreEqual(10L, proxy.DoSomething(10L, 1));
 
 			Assert.AreEqual("DoSomething ", logger.LogContents);
 		}
@@ -111,13 +109,13 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void ProxyWithGenInterfaceWithGenericArrays()
 		{
-			IGenInterfaceWithGenArray<int> proxy =
+			var proxy =
 				generator.CreateInterfaceProxyWithTarget<IGenInterfaceWithGenArray<int>>(
 					new GenInterfaceWithGenArray<int>(), logger);
 
 			Assert.IsNotNull(proxy);
 
-			int[] items = new int[] { 1, 2, 3 };
+			var items = new[] { 1, 2, 3 };
 			proxy.CopyTo(items);
 			items = proxy.CreateItems();
 			Assert.IsNotNull(items);
@@ -129,7 +127,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void ProxyWithGenInterfaceWithBase()
 		{
-			IGenInterfaceHierarchySpecialization<int> proxy =
+			var proxy =
 				generator.CreateInterfaceProxyWithTarget<IGenInterfaceHierarchySpecialization<int>>(
 					new GenInterfaceHierarchy<int>(), logger);
 
@@ -147,7 +145,7 @@ namespace Castle.DynamicProxy.Tests
 		{
 			var target = generator.CreateInterfaceProxyWithTarget<InterfaceWithExplicitImpl<int>>(
 				new GenExplicitImplementation<int>(), logger);
-			IEnumerator<int> enumerator = target.GetEnum1();
+			var enumerator = target.GetEnum1();
 			Assert.IsNotNull(enumerator);
 		}
 
@@ -155,7 +153,7 @@ namespace Castle.DynamicProxy.Tests
 		public void TwoGenericsInterfaceWithoutTarget()
 		{
 			generator.CreateInterfaceProxyWithoutTarget(typeof(GenInterface<object>),
-														new Type[] { typeof(InterfaceWithExplicitImpl<int>) },
+														new[] { typeof(InterfaceWithExplicitImpl<int>) },
 														new LogInvocationInterceptor());
 		}
 
@@ -163,7 +161,7 @@ namespace Castle.DynamicProxy.Tests
 		public void NonGenInterfaceWithParentGenClassImplementingGenInterface()
 		{
 			generator.CreateInterfaceProxyWithoutTarget(typeof(IUserRepository),
-														new Type[] { typeof(InterfaceWithExplicitImpl<int>) },
+														new[] { typeof(InterfaceWithExplicitImpl<int>) },
 														new LogInvocationInterceptor());
 		}
 
@@ -176,7 +174,7 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInGenIfcGenMethodRefTypeNoTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
+			var interceptor = new KeepDataInterceptor();
 			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethodUsingT<List<object>>>(interceptor);
 
 			proxy.Execute(1, null);
@@ -193,8 +191,8 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInGenIfcGenMethodValueTypeNoTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
-			IGenericWithGenericMethodUsingT<int> proxy =
+			var interceptor = new KeepDataInterceptor();
+			var proxy =
 				generator.CreateInterfaceProxyWithoutTarget<IGenericWithGenericMethodUsingT<int>>(interceptor);
 
 			proxy.Execute(1, 1);
@@ -224,8 +222,8 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInGenIfcNongenMethodValueTypeNoTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
-			IGenInterfaceHierarchyBase<int> proxy =
+			var interceptor = new KeepDataInterceptor();
+			var proxy =
 				generator.CreateInterfaceProxyWithoutTarget<IGenInterfaceHierarchyBase<int>>(interceptor);
 
 			proxy.Get();
@@ -238,8 +236,8 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInNongenIfcGenMethodNoTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
-			OnlyGenMethodsInterface proxy = generator.CreateInterfaceProxyWithoutTarget<OnlyGenMethodsInterface>(interceptor);
+			var interceptor = new KeepDataInterceptor();
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<OnlyGenMethodsInterface>(interceptor);
 
 			proxy.DoSomething(1);
 			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(int), typeof(int));
@@ -277,10 +275,10 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInGenIfcGenMethodValueTypeWithTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
+			var interceptor = new KeepDataInterceptor();
 			IGenericWithGenericMethodUsingT<int> target = new GenericWithGenericMethodUsingTImpl<int>();
-			IGenericWithGenericMethodUsingT<int> proxy =
-				generator.CreateInterfaceProxyWithTarget<IGenericWithGenericMethodUsingT<int>>(target, interceptor);
+			var proxy =
+				generator.CreateInterfaceProxyWithTarget(target, interceptor);
 
 			proxy.Execute(1, 1);
 			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(void), typeof(int),
@@ -302,10 +300,10 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInGenIfcNongenMethodRefTypeWithTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
+			var interceptor = new KeepDataInterceptor();
 			IGenInterfaceHierarchyBase<List<object>> target = new GenInterfaceHierarchy<List<object>>();
-			IGenInterfaceHierarchyBase<List<object>> proxy =
-				generator.CreateInterfaceProxyWithTarget<IGenInterfaceHierarchyBase<List<object>>>(target, interceptor);
+			var proxy =
+				generator.CreateInterfaceProxyWithTarget(target, interceptor);
 
 			proxy.Add(null);
 			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(void),
@@ -326,10 +324,10 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInGenIfcNongenMethodValueTypeWithTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
+			var interceptor = new KeepDataInterceptor();
 			IGenInterfaceHierarchyBase<int> target = new GenInterfaceHierarchy<int>();
-			IGenInterfaceHierarchyBase<int> proxy =
-				generator.CreateInterfaceProxyWithTarget<IGenInterfaceHierarchyBase<int>>(target, interceptor);
+			var proxy =
+				generator.CreateInterfaceProxyWithTarget(target, interceptor);
 
 			proxy.Add(0);
 			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(void), typeof(int));
@@ -348,10 +346,10 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void MethodInfoClosedInNongenIfcGenMethodWithTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
+			var interceptor = new KeepDataInterceptor();
 			OnlyGenMethodsInterface target = new OnlyGenMethodsInterfaceImpl();
-			OnlyGenMethodsInterface proxy =
-				generator.CreateInterfaceProxyWithTarget<OnlyGenMethodsInterface>(target, interceptor);
+			var proxy =
+				generator.CreateInterfaceProxyWithTarget(target, interceptor);
 
 			proxy.DoSomething(1);
 			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(int), typeof(int));
@@ -373,13 +371,12 @@ namespace Castle.DynamicProxy.Tests
 		[ExpectedException(typeof(ArgumentException))]
 		public void ThrowsWhenProxyingGenericTypeDefNoTarget()
 		{
-			KeepDataInterceptor interceptor = new KeepDataInterceptor();
-			object o = generator.CreateInterfaceProxyWithoutTarget(typeof(IGenInterfaceHierarchyBase<>), interceptor);
+			var interceptor = new KeepDataInterceptor();
+			var o = generator.CreateInterfaceProxyWithoutTarget(typeof(IGenInterfaceHierarchyBase<>), interceptor);
 		}
 
 		[Test(Description = "There is a strange CLR bug resulting from our loading the tokens of methods in generic types. "
 		                    + "This test ensures we do not trigger it.")]
-		//[Ignore("Currently, we trigger the bug, and work around it - see MethodFinder")]
 		public void TypeGetMethodsIsStable()
 		{
 			ProxyWithGenInterfaceWithBase();
@@ -409,7 +406,7 @@ namespace Castle.DynamicProxy.Tests
 		public void TypeGetMethodsIsStableInDifferentAppDomains()
 		{
 			ProxyWithGenInterfaceWithBase();
-			AppDomain newDomain =
+			var newDomain =
 				AppDomain.CreateDomain("NewDomain", AppDomain.CurrentDomain.Evidence, AppDomain.CurrentDomain.SetupInformation);
 			try
 			{
@@ -420,7 +417,6 @@ namespace Castle.DynamicProxy.Tests
 				AppDomain.Unload(newDomain);
 			}
 		}
-#endif
 #endif
 	}
 }
