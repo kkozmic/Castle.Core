@@ -95,11 +95,7 @@ namespace Castle.DynamicProxy.Contributors
 				return invocation;
 			}
 
-			invocation = new CompositionInvocationTypeGenerator(method.Method.DeclaringType,
-			                                                    method,
-			                                                    method.Method,
-			                                                    canChangeTarget,
-			                                                    null)
+			invocation = new CompositionInvocationTypeGenerator(method.Method.DeclaringType, method.Method, method.Method, canChangeTarget, null)
 				.Generate(@class, options, namingScope).BuildType();
 
 			scope.RegisterInCache(key, invocation);

@@ -20,38 +20,36 @@ namespace Castle.DynamicProxy.Generators
 	using System.Reflection;
 
 	using Castle.DynamicProxy.Generators.Emitters;
-	using Castle.DynamicProxy.Generators.Emitters.CodeBuilders;
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using Castle.DynamicProxy.Internal;
 	using Castle.DynamicProxy.Tokens;
 
 	public abstract class InvocationTypeGenerator : IGenerator<AbstractTypeEmitter>
 	{
-		protected readonly Type targetType;
-		protected readonly MetaMethod method;
+		private readonly Type targetType;
+		private readonly MethodInfo method;
 		private readonly MethodInfo callback;
 		private readonly bool canChangeTarget;
 		private readonly IInvocationCreationContributor contributor;
 
-		protected InvocationTypeGenerator(Type targetType, MetaMethod method, MethodInfo callback, bool canChangeTarget, IInvocationCreationContributor contributor)
+		protected InvocationTypeGenerator(Type targetType, MethodInfo method, MethodInfo callback, bool canChangeTarget, IInvocationCreationContributor contributor)
 		{
-			this.targetType = targetType;
-			this.method = method;
-			this.callback = callback;
+			this.targetType = targetType.CheckOpenIfGeneric("targetType");
+			this.method = method.CheckOpenIfGeneric("method");
+			this.callback = callback.CheckOpenIfGeneric("callback");
 			this.canChangeTarget = canChangeTarget;
 			this.contributor = contributor;
 		}
 
 		public AbstractTypeEmitter Generate(ClassEmitter proxy, ProxyGenerationOptions options, INamingScope namingScope)
 		{
-			var methodInfo = method.Method;
-
 			var interfaces = new Type[0];
 			if (canChangeTarget)
 			{
 				interfaces = new[] { typeof(IChangeProxyTarget) };
 			}
 
-			var invocation = GetEmitter(proxy, interfaces, namingScope, methodInfo);
+			var invocation = GetEmitter(proxy, interfaces, namingScope, method);
 
 			CreateConstructor(invocation, options);
 
@@ -61,7 +59,7 @@ namespace Castle.DynamicProxy.Generators
 				ImplementChangeProxyTargetInterface(proxy, invocation, targetField);
 			}
 
-			ImplemementInvokeMethodOnTarget(invocation, methodInfo.GetParameters(), targetField, callback);
+			ImplemementInvokeMethodOnTarget(invocation, method.GetParameters(), targetField, callback);
 
 #if !SILVERLIGHT
 			invocation.DefineCustomAttribute<SerializableAttribute>();
@@ -69,6 +67,19 @@ namespace Castle.DynamicProxy.Generators
 
 			return invocation;
 		}
+
+		protected abstract Type GetBaseType();
+
+		protected abstract FieldReference GetTargetReference();
+
+		/// <summary>
+		/// Generates the constructor for the class that extends
+		/// <see cref="AbstractInvocation"/>
+		/// </summary>
+		/// <param name="targetFieldType"></param>
+		/// <param name="proxyGenerationOptions"></param>
+		/// <param name="baseConstructor"></param>
+		protected abstract ArgumentReference[] GetBaseCtorArguments(Type targetFieldType, ProxyGenerationOptions proxyGenerationOptions, out ConstructorInfo baseConstructor);
 
 		private void CreateConstructor(AbstractTypeEmitter invocation, ProxyGenerationOptions options)
 		{
@@ -88,8 +99,6 @@ namespace Castle.DynamicProxy.Generators
 			}
 			return contributor.CreateConstructor(baseCtorArguments, invocation);
 		}
-
-		protected abstract FieldReference GetTargetReference();
 
 		private AbstractTypeEmitter GetEmitter(ClassEmitter @class, Type[] interfaces, INamingScope namingScope,
 		                                                  MethodInfo methodInfo)
@@ -111,8 +120,6 @@ namespace Castle.DynamicProxy.Generators
 			}
 			return methodArgs;
 		}
-
-		protected abstract Type GetBaseType();
 
 		private void ImplementChangeProxyTargetInterface(ClassEmitter @class, AbstractTypeEmitter invocation, FieldReference targetField)
 		{
@@ -152,7 +159,8 @@ namespace Castle.DynamicProxy.Generators
 			ImplementInvokeMethodOnTarget(invocation, parameters, invokeMethodOnTarget, targetField);
 		}
 
-		protected virtual void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation, ParameterInfo[] parameters,
+		protected virtual void ImplementInvokeMethodOnTarget(AbstractTypeEmitter invocation,
+															 ParameterInfo[] parameters,
 															 MethodEmitter invokeMethodOnTarget,
 															 Reference targetField)
 		{
@@ -168,13 +176,12 @@ namespace Castle.DynamicProxy.Generators
 				EmitCallEnsureValidTarget(invokeMethodOnTarget);
 			}
 
-			Expression[] args = new Expression[parameters.Length];
+			var args = new Expression[parameters.Length];
 
 			// Idea: instead of grab parameters one by one
 			// we should grab an array
-			Dictionary<int, LocalReference> byRefArguments = new Dictionary<int, LocalReference>();
-
-			for (int i = 0; i < parameters.Length; i++)
+			var byRefArguments = new Dictionary<int, LocalReference>();
+			for (var i = 0; i < parameters.Length; i++)
 			{
 				ParameterInfo param = parameters[i];
 
@@ -256,9 +263,9 @@ namespace Castle.DynamicProxy.Generators
 			invokeMethodOnTarget.CodeBuilder.AddStatement(new ReturnStatement());
 		}
 
-		private AbstractCodeBuilder EmitCallEnsureValidTarget(MethodEmitter invokeMethodOnTarget)
+		private void EmitCallEnsureValidTarget(MethodEmitter invokeMethodOnTarget)
 		{
-			return invokeMethodOnTarget.CodeBuilder.AddStatement(
+			invokeMethodOnTarget.CodeBuilder.AddStatement(
 				new ExpressionStatement(
 					new MethodInvocationExpression(SelfReference.Self, InvocationMethods.EnsureValidTarget)));
 		}
@@ -275,15 +282,6 @@ namespace Castle.DynamicProxy.Generators
 				args) { VirtualCall = true };
 			return methodOnTargetInvocationExpression;
 		}
-
-		/// <summary>
-		/// Generates the constructor for the class that extends
-		/// <see cref="AbstractInvocation"/>
-		/// </summary>
-		/// <param name="targetFieldType"></param>
-		/// <param name="proxyGenerationOptions"></param>
-		/// <param name="baseConstructor"></param>
-		protected abstract ArgumentReference[] GetBaseCtorArguments(Type targetFieldType, ProxyGenerationOptions proxyGenerationOptions, out ConstructorInfo baseConstructor);
 
 		private MethodInfo GetCallbackMethod( AbstractTypeEmitter invocation)
 		{
@@ -302,7 +300,7 @@ namespace Castle.DynamicProxy.Generators
 				return callbackMethod;
 			}
 
-			return callbackMethod.MakeGenericMethod(invocation.GetGenericArgumentsFor(method.Method));
+			return callbackMethod.MakeGenericMethod(invocation.GetGenericArgumentsFor(method));
 		}
 	}
 }

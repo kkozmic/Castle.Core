@@ -24,8 +24,8 @@ namespace Castle.DynamicProxy.Generators
 	{
 		public static readonly Type BaseType = typeof(InheritanceInvocation);
 
-		public InheritanceInvocationTypeGenerator(Type targetType, MetaMethod method, MethodInfo callback, IInvocationCreationContributor contributor)
-			: base(targetType, method, callback, false,contributor)
+		public InheritanceInvocationTypeGenerator(Type targetType, MethodInfo method, MethodInfo callback, IInvocationCreationContributor contributor)
+			: base(targetType, method, callback, false, contributor)
 		{
 		}
 
