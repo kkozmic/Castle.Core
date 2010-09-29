@@ -57,7 +57,7 @@ namespace Castle.DynamicProxy
 
 		public override MethodInfo MethodInvocationTarget
 		{
-			get { return InvocationHelper.GetMethodOnType(targetType, Method); }
+			get { return targetType.GetMethod(Method); }
 		}
 
 		protected abstract override void InvokeMethodOnTarget();

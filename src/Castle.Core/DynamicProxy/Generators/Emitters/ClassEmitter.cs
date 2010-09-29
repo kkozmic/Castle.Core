@@ -195,11 +195,6 @@ namespace Castle.DynamicProxy.Generators.Emitters
 		// implementation), call CopyGenericParametersFromMethod and replace baseType and interfaces by versions bound to the newly created GenericTypeParams.
 		protected virtual IEnumerable<Type> InitializeGenericArgumentsFromBases(ref Type baseType, IEnumerable<Type> interfaces)
 		{
-			if (baseType != null && baseType.IsGenericTypeDefinition)
-			{
-				throw new NotSupportedException("ClassEmitter does not support open generic base types. Type: " + baseType.FullName);
-			}
-
 			if (interfaces == null)
 			{
 				return interfaces;

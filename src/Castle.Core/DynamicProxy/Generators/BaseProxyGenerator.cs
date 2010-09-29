@@ -46,6 +46,7 @@ namespace Castle.DynamicProxy.Generators
 
 		protected BaseProxyGenerator(ModuleScope scope, Type targetType)
 		{
+			CheckNotGenericTypeDefinition(targetType, "@interface");
 			this.scope = scope;
 			this.targetType = targetType;
 		}

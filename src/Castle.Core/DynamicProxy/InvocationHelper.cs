@@ -29,17 +29,17 @@ namespace Castle.DynamicProxy
 
 		private static readonly Lock @lock = Lock.Create();
 
-		public static MethodInfo GetMethodOnObject(object target, MethodInfo proxiedMethod)
+		public static MethodInfo GetMethod(this object target, MethodInfo proxiedMethod)
 		{
 			if (target == null)
 			{
 				return null;
 			}
 
-			return GetMethodOnType(target.GetType(), proxiedMethod);
+			return GetMethod(target.GetType(), proxiedMethod);
 		}
 
-		public static MethodInfo GetMethodOnType(Type type, MethodInfo proxiedMethod)
+		public static MethodInfo GetMethod(this Type type, MethodInfo proxiedMethod)
 		{
 			if (type == null)
 			{

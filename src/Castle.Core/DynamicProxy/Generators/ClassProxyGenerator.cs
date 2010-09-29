@@ -16,6 +16,7 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Diagnostics;
 	using System.Linq;
 	using System.Reflection;
 	using Castle.DynamicProxy.Contributors;
@@ -48,12 +49,27 @@ namespace Castle.DynamicProxy.Generators
 		{
 			// make sure ProxyGenerationOptions is initialized
 			options.Initialize();
+			var closingTypes = Type.EmptyTypes;
+			if (targetType.IsGenericType)
+			{
+				closingTypes = targetType.GetGenericArguments();
+				targetType = targetType.GetGenericTypeDefinition();
+			}
 
-			interfaces = TypeUtil.GetAllInterfaces(interfaces).ToArray();
 			CheckNotGenericTypeDefinitions(interfaces, "interfaces");
 			ProxyGenerationOptions = options;
+
+			interfaces = TypeUtil.GetAllInterfaces(interfaces).ToArray();
 			var cacheKey = new CacheKey(targetType, interfaces, options);
-			return ObtainProxyType(cacheKey, (n, s) => GenerateType(n, interfaces, s));
+
+			var proxyType = ObtainProxyType(cacheKey, (n, s) => GenerateType(n, interfaces, s));
+			if (closingTypes.Length > 0)
+			{
+				Debug.Assert(proxyType.IsGenericTypeDefinition);
+				proxyType = proxyType.MakeGenericType(closingTypes);
+				InitializeStaticFields(proxyType);
+			}
+			return proxyType;
 		}
 
 		protected virtual Type GenerateType(string name, Type[] interfaces, INamingScope namingScope)
