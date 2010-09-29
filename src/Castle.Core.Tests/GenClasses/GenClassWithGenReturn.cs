@@ -14,6 +14,7 @@
 
 namespace Castle.DynamicProxy.Tests.GenClasses
 {
+	// TODO: does this class really have to cover so many cases? Should be broken into smaller ones
 	public class GenClassWithGenReturn<T, Z> where T : new() where Z : new()
 	{
 		public virtual T DoSomethingT()

@@ -82,9 +82,19 @@ namespace Castle.DynamicProxy.Contributors
 			return new MethodWithInvocationGenerator(method,
 			                                         proxy.GetField("__interceptors"),
 			                                         invocation,
-			                                         (c, m) => new TypeTokenExpression(targetType),
+			                                         (c, m) => new TypeTokenExpression(GetClosedTargetType(proxy)),
 			                                         overrideMethod,
 			                                         null);
+		}
+
+		private Type GetClosedTargetType(ClassEmitter proxy)
+		{
+			if (targetType.IsGenericTypeDefinition == false)
+			{
+				return targetType;
+			}
+
+			return targetType.MakeGenericType(proxy.GetOverridingGenericArguments(targetType.GetGenericArguments()));
 		}
 
 		private Type BuildInvocationType(MetaMethod method, ClassEmitter @class, ProxyGenerationOptions options)
