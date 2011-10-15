@@ -45,8 +45,7 @@ namespace Castle.DynamicProxy.Generators
 			return ObtainProxyType(cacheKey, GenerateType);
 		}
 
-		protected virtual IEnumerable<Type> GetTypeImplementerMapping(out IEnumerable<ITypeContributor> contributors,
-		                                                              INamingScope namingScope)
+		protected virtual Type[] GetTypeImplementerMapping(out IEnumerable<ITypeContributor> contributors, INamingScope namingScope)
 		{
 			var methodsToSkip = new List<MethodInfo>();
 			var proxyInstance = new ClassProxyInstanceContributor(targetType, methodsToSkip, additionalInterfacesToProxy,
@@ -135,7 +134,7 @@ namespace Castle.DynamicProxy.Generators
 				additionalInterfacesContributor,
 				proxyInstance
 			};
-			return typeImplementerMapping.Keys;
+			return typeImplementerMapping.Keys.ToArray();
 		}
 
 		private FieldReference CreateTargetField(ClassEmitter emitter)
