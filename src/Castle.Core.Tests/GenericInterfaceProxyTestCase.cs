@@ -27,6 +27,8 @@ namespace Castle.DynamicProxy.Tests
 
 	using NUnit.Framework;
 
+	using IEmpty = Castle.DynamicProxy.Tests.Interfaces.IEmpty;
+
 	[TestFixture]
 	public class GenericInterfaceProxyTestCase : BasePEVerifyTestCase
 	{
