@@ -27,11 +27,15 @@ namespace Castle.DynamicProxy.Generators
 
 	public class InterfaceProxyWithTargetGenerator : BaseProxyGenerator
 	{
+		private readonly Type proxyTargetType;
+		private readonly Type[] additionalInterfacesToProxy;
 		protected FieldReference targetField;
 
-		public InterfaceProxyWithTargetGenerator(ModuleScope scope, Type @interface)
-			: base(scope, @interface)
+		public InterfaceProxyWithTargetGenerator(ModuleScope scope, Type @interface, Type proxyTargetType, Type[] additionalInterfacesToProxy, ProxyGenerationOptions proxyGenerationOptions)
+			: base(scope, @interface, proxyGenerationOptions)
 		{
+			this.proxyTargetType = proxyTargetType;
+			this.additionalInterfacesToProxy = additionalInterfacesToProxy;
 			CheckNotGenericTypeDefinition(@interface, "@interface");
 		}
 
@@ -45,7 +49,12 @@ namespace Castle.DynamicProxy.Generators
 			get { return ProxyTypeConstants.InterfaceWithTarget; }
 		}
 
-		public Type GenerateCode(Type proxyTargetType, Type[] interfaces, ProxyGenerationOptions options)
+		public override Type GetProxyType()
+		{
+			return GenerateCode(proxyTargetType, additionalInterfacesToProxy, ProxyGenerationOptions);
+		}
+
+		protected Type GenerateCode(Type proxyTargetType, Type[] interfaces, ProxyGenerationOptions options)
 		{
 			// make sure ProxyGenerationOptions is initialized
 			options.Initialize();
@@ -53,7 +62,6 @@ namespace Castle.DynamicProxy.Generators
 			CheckNotGenericTypeDefinition(proxyTargetType, "proxyTargetType");
 			CheckNotGenericTypeDefinitions(interfaces, "interfaces");
 			EnsureValidBaseType(options.BaseTypeForInterfaceProxy);
-			ProxyGenerationOptions = options;
 
 			interfaces = TypeUtil.GetAllInterfaces(interfaces).ToArray();
 			var cacheKey = new CacheKey(proxyTargetType, targetType, interfaces, options);
@@ -87,8 +95,9 @@ namespace Castle.DynamicProxy.Generators
 			}
 			return contributor;
 		}
-		
+
 #if (!SILVERLIGHT)
+
 		protected override void CreateTypeAttributes(ClassEmitter emitter)
 		{
 			base.CreateTypeAttributes(emitter);
