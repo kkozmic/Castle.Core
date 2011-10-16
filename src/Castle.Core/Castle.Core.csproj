@@ -366,13 +366,7 @@
     <Compile Include="DynamicProxy\Generators\Emitters\CodeBuilders\MethodCodeBuilder.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DynamicProxy\Generators\Emitters\ConstructorCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="DynamicProxy\Generators\Emitters\ConstructorEmitter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DynamicProxy\Generators\Emitters\EventCollection.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DynamicProxy\Generators\Emitters\EventEmitter.cs">
@@ -388,22 +382,13 @@
     <Compile Include="DynamicProxy\Generators\Emitters\LdindOpCodesDictionary.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="DynamicProxy\Generators\Emitters\MethodCollection.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="DynamicProxy\Generators\Emitters\MethodEmitter.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DynamicProxy\Generators\Emitters\NestedClassCollection.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DynamicProxy\Generators\Emitters\NestedClassEmitter.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DynamicProxy\Generators\Emitters\OpCodeUtil.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="DynamicProxy\Generators\Emitters\PropertiesCollection.cs">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="DynamicProxy\Generators\Emitters\PropertyEmitter.cs">
