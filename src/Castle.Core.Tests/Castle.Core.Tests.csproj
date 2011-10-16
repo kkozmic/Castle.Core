@@ -289,6 +289,9 @@
     <Compile Include="GenInterfaces\GenInterfaceWithGenericTypes.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethods.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethodsAndGenReturn.cs" />
+    <Compile Include="GenInterfaces\IEmpty.cs" />
+    <Compile Include="GenInterfaces\IEmptyWithBaseGenericInterfaceConstraint.cs" />
+    <Compile Include="GenInterfaces\IEmptyWithBaseInterfaceConstraint.cs" />
     <Compile Include="Interceptors\LogInvocationInterceptor.cs" />
     <Compile Include="Interceptors\ProceedNTimesInterceptor.cs" />
     <Compile Include="Interceptors\ThrowingInterceptor.cs" />
