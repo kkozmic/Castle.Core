@@ -289,7 +289,11 @@
     <Compile Include="GenInterfaces\GenInterfaceWithGenericTypes.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethods.cs" />
     <Compile Include="GenInterfaces\GenInterfaceWithGenMethodsAndGenReturn.cs" />
+    <Compile Include="GenInterfaces\IConstraint_MethodIsClassNew_Type_is_contravariant.cs" />
     <Compile Include="GenInterfaces\IConstraint_MethodIsType.cs" />
+    <Compile Include="GenInterfaces\IConstraint_MethodIsTypeAndClass.cs" />
+    <Compile Include="GenInterfaces\IConstraint_MethodIsTypeAndStruct.cs" />
+    <Compile Include="GenInterfaces\IConstraint_MethodIsTypeAndStruct_TypeIsClass.cs" />
     <Compile Include="GenInterfaces\IConstraint_MethodIsType_TypeIsClass.cs" />
     <Compile Include="GenInterfaces\IEmpty.cs" />
     <Compile Include="GenInterfaces\IEmptyClass.cs" />
@@ -324,6 +328,7 @@
     <Compile Include="OpenGenerics\InterfaceProxyWithoutTargetWithInvocationTestCase.cs" />
     <Compile Include="OpenGenerics\InvocationForInterfaceProxyWithoutTargetTestCase.cs" />
     <Compile Include="OpenGenerics\OpenGenericAssertionExtensions.cs" />
+    <Compile Include="Scratchpad.cs" />
     <Compile Include="ThrowingInterceptorException.cs" />
     <Compile Include="XmlConfigurationDeserializerTests.cs" />
     <Compile Include="XmlSerializationTestCase.cs" />
