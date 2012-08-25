@@ -15,7 +15,6 @@
 namespace Castle.DynamicProxy.Generators
 {
 	using System;
-	using System.Diagnostics;
 	using System.Reflection;
 	using System.Reflection.Emit;
 #if !SILVERLIGHT
@@ -26,6 +25,7 @@ namespace Castle.DynamicProxy.Generators
 	using Castle.DynamicProxy.Contributors;
 	using Castle.DynamicProxy.Generators.Emitters;
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
+	using Castle.DynamicProxy.Internal;
 	using Castle.DynamicProxy.Tokens;
 
 	public class MethodWithInvocationGenerator : MethodGenerator
@@ -58,47 +58,59 @@ namespace Castle.DynamicProxy.Generators
 			return methodInterceptors;
 		}
 
-		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter @class, ProxyGenerationOptions options, INamingScope namingScope)
+		protected override MethodEmitter BuildProxiedMethodBody(MethodEmitter emitter, ClassEmitter proxy, ProxyGenerationOptions options, INamingScope namingScope)
 		{
 			var invocationType = invocation;
 
-			Trace.Assert(MethodToOverride.IsGenericMethod == invocationType.IsGenericTypeDefinition);
 			var genericArguments = Type.EmptyTypes;
 
 			var constructor = invocation.GetConstructors()[0];
+			var proxiedMethodToken = proxy.CreateStaticField(namingScope.GetUniqueName("token_" + MethodToOverride.Name), typeof(MethodInfo));
 
-			Expression proxiedMethodTokenExpression;
 			if (MethodToOverride.IsGenericMethod)
 			{
 				// bind generic method arguments to invocation's type arguments
 				genericArguments = emitter.MethodBuilder.GetGenericArguments();
-				invocationType = invocationType.MakeGenericType(genericArguments);
+				var invocationTypeGenericArguments = CollectionExtensions.ConcatAll(proxy.TypeBuilder.GetGenericArguments(), genericArguments);
+				invocationType = invocationType.MakeGenericType(invocationTypeGenericArguments);
 				constructor = TypeBuilder.GetConstructor(invocationType, constructor);
 
-				// Not in the cache: generic method
-				proxiedMethodTokenExpression = new MethodTokenExpression(MethodToOverride.MakeGenericMethod(genericArguments));
+				if (proxy.IsGenericType && emitter.HasConstraintOnTypeParameter)
+				{
+					// NOTE: This works around VerificationException that's thrown if we try to load directly via ldtoken a method with some generic arguments that have constraints on type arguments
+					proxy.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(proxiedMethodToken, new MethodInvocationExpression(
+					                                                                                         	null,
+					                                                                                         	GenericsHelper.GetAdjustedOpenMethodToken,
+					                                                                                         	new TypeTokenExpression(proxy.AdjustMethod(MethodToOverride).DeclaringType),
+					                                                                                         	new ConstReference(MethodToOverride.MetadataToken).ToExpression())));
+				}
+				else
+				{
+					var methodForToken = proxy.AdjustMethod(MethodToOverride);
+					proxy.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(proxiedMethodToken, new MethodTokenExpression(methodForToken)));
+					//proxy.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(
+					//													proxiedMethodToken,
+					//													new MethodInvocationExpression(proxiedMethodToken, MethodInfoMethods.GetGenericMethodDefinition) { VirtualCall = true }));
+				}
 			}
 			else
 			{
-				var proxiedMethodToken = @class.CreateStaticField(namingScope.GetUniqueName("token_" + MethodToOverride.Name), typeof(MethodInfo));
-				@class.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(proxiedMethodToken, new MethodTokenExpression(MethodToOverride)));
-
-				proxiedMethodTokenExpression = proxiedMethodToken.ToExpression();
+				var methodForToken = proxy.AdjustMethod(MethodToOverride);
+				proxy.ClassConstructor.CodeBuilder.AddStatement(new AssignStatement(proxiedMethodToken, new MethodTokenExpression(methodForToken)));
 			}
 
-			var methodInterceptors = SetMethodInterceptors(@class, namingScope, emitter, proxiedMethodTokenExpression);
+			var methodInterceptors = SetMethodInterceptors(proxy, namingScope, emitter, proxiedMethodToken.ToExpression());
 
 			var dereferencedArguments = IndirectReference.WrapIfByRef(emitter.Arguments);
 			var hasByRefArguments = HasByRefArguments(emitter.Arguments);
 
-			var arguments = GetCtorArguments(@class, proxiedMethodTokenExpression, dereferencedArguments, methodInterceptors);
-			var ctorArguments = ModifyArguments(@class, arguments);
+			var arguments = GetCtorArguments(proxy, proxiedMethodToken.ToExpression(), dereferencedArguments, methodInterceptors);
+			var ctorArguments = ModifyArguments(proxy, arguments);
 
 			var invocationLocal = emitter.CodeBuilder.DeclareLocal(invocationType);
-			emitter.CodeBuilder.AddStatement(new AssignStatement(invocationLocal,
-			                                                     new NewInstanceExpression(constructor, ctorArguments)));
+			emitter.CodeBuilder.AddStatement(new AssignStatement(invocationLocal, new NewInstanceExpression(constructor, ctorArguments)));
 
-			if (MethodToOverride.ContainsGenericParameters)
+			if (MethodToOverride.IsGenericMethod)
 			{
 				EmitLoadGenricMethodArguments(emitter, MethodToOverride.MakeGenericMethod(genericArguments), invocationLocal);
 			}
@@ -195,19 +207,9 @@ namespace Castle.DynamicProxy.Generators
 			};
 		}
 
-		private Expression[] ModifyArguments(ClassEmitter @class, Expression[] arguments)
-		{
-			if (contributor == null)
-			{
-				return arguments;
-			}
-
-			return contributor.GetConstructorInvocationArguments(arguments, @class);
-		}
-
 		private bool HasByRefArguments(ArgumentReference[] arguments)
 		{
-			for (int i = 0; i < arguments.Length; i++ )
+			for (var i = 0; i < arguments.Length; i++)
 			{
 				if (arguments[i].Type.IsByRef)
 				{
@@ -216,6 +218,16 @@ namespace Castle.DynamicProxy.Generators
 			}
 
 			return false;
+		}
+
+		private Expression[] ModifyArguments(ClassEmitter @class, Expression[] arguments)
+		{
+			if (contributor == null)
+			{
+				return arguments;
+			}
+
+			return contributor.GetConstructorInvocationArguments(arguments, @class);
 		}
 	}
 }

@@ -12,27 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests.BugsReported
+namespace CastleTests
 {
-	using System;
+	using System.Linq;
+
+	using CastleTests.GenInterfaces;
 
 	using NUnit.Framework;
 
-	public class Core40ClassToProxy
-	{
-		public Core40ClassToProxy(Object arg1, Object arg2)
-		{
-		}
-	}
-
-	[TestFixture]
-	public class Core40 : BasePEVerifyTestCase
+	public class Scratchpad
 	{
 		[Test]
-		[ExpectedException(typeof(InvalidProxyConstructorArgumentsException))]
-		public void ShouldGenerateTypeWithIndexers()
+		public void Type_with_value_type_and_base_class_constrain()
 		{
-			var proxy = generator.CreateClassProxy(typeof(Core40ClassToProxy), new object[] { null, null, null });
+			var type = typeof(IConstraint_MethodIsTypeAndStruct<object>);
+			var method = type.GetMethods().Single();
+			var genericArgument = method.GetGenericArguments().Single();
+			var constraints = genericArgument.GetGenericParameterConstraints();
+
+			// one is System.ValueType, another is the actual TType
+			Assert.AreEqual(2,constraints.Length);
 		}
 	}
 }

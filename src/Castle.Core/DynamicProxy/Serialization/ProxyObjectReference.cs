@@ -22,14 +22,10 @@ namespace Castle.DynamicProxy.Serialization
 	using System.Diagnostics;
 	using System.Reflection;
 	using System.Runtime.Serialization;
-	using System.Security;
 
 	using Castle.DynamicProxy.Generators;
-	using Castle.DynamicProxy.Generators.Emitters;
 	using Castle.DynamicProxy.Internal;
 
-#if DOTNET40
-#endif
 
 	/// <summary>
 	///   Handles the deserialization of proxies.
@@ -49,6 +45,7 @@ namespace Castle.DynamicProxy.Serialization
 
 		private bool isInterfaceProxy;
 		private bool delegateToBase;
+		private bool omitTarget;
 
 		/// <summary>
 		///   Resets the <see cref = "ModuleScope" /> used for deserialization to a new scope.
@@ -91,7 +88,7 @@ namespace Castle.DynamicProxy.Serialization
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		protected ProxyObjectReference(SerializationInfo info, StreamingContext context)
 		{
@@ -100,7 +97,7 @@ namespace Castle.DynamicProxy.Serialization
 
 			baseType = DeserializeTypeFromString("__baseType");
 
-			var _interfaceNames = (String[])info.GetValue("__interfaces", typeof(String[]));
+			var _interfaceNames = GetValue<String[]>("__interfaces");
 			interfaces = new Type[_interfaceNames.Length];
 
 			for (var i = 0; i < _interfaceNames.Length; i++)
@@ -108,8 +105,7 @@ namespace Castle.DynamicProxy.Serialization
 				interfaces[i] = Type.GetType(_interfaceNames[i]);
 			}
 
-			proxyGenerationOptions =
-				(ProxyGenerationOptions)info.GetValue("__proxyGenerationOptions", typeof(ProxyGenerationOptions));
+			proxyGenerationOptions = GetValue<ProxyGenerationOptions>("__proxyGenerationOptions");
 			proxy = RecreateProxy();
 
 			// We'll try to deserialize as much of the proxy state as possible here. This is just best effort; due to deserialization dependency reasons,
@@ -123,7 +119,7 @@ namespace Castle.DynamicProxy.Serialization
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		protected virtual object RecreateProxy()
 		{
@@ -139,39 +135,44 @@ namespace Castle.DynamicProxy.Serialization
 				return RecreateClassProxyWithTarget();
 			}
 			isInterfaceProxy = true;
+			if(generatorType.Equals(ProxyTypeConstants.InterfaceWithoutTarget))
+			{
+				omitTarget = true;
+			}
 			return RecreateInterfaceProxy(generatorType);
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		private object RecreateClassProxyWithTarget()
 		{
 			var generator = new ClassProxyWithTargetGenerator(scope, baseType, interfaces, proxyGenerationOptions);
-			var proxyType = generator.GetGeneratedType();
+			var proxyType = generator.GetProxyType();
 			return InstantiateClassProxy(proxyType);
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		public object RecreateInterfaceProxy(string generatorType)
 		{
 			var @interface = DeserializeTypeFromString("__theInterface");
-			var targetType = DeserializeTypeFromString("__targetFieldType");
 
 			InterfaceProxyWithTargetGenerator generator;
 			if (generatorType == ProxyTypeConstants.InterfaceWithTarget)
 			{
-				generator = new InterfaceProxyWithTargetGenerator(scope, @interface);
+				var targetType = DeserializeTypeFromString("__targetFieldType");
+				generator = new InterfaceProxyWithTargetGenerator(scope, @interface, targetType, interfaces, proxyGenerationOptions);
 			}
 			else if (generatorType == ProxyTypeConstants.InterfaceWithoutTarget)
 			{
-				generator = new InterfaceProxyWithoutTargetGenerator(scope, @interface);
+				generator = new InterfaceProxyWithoutTargetGenerator(scope, @interface, interfaces, proxyGenerationOptions);
 			}
 			else if (generatorType == ProxyTypeConstants.InterfaceWithTargetInterface)
 			{
-				generator = new InterfaceProxyWithTargetInterfaceGenerator(scope, @interface);
+				var targetType = DeserializeTypeFromString("__targetFieldType");
+				generator = new InterfaceProxyWithTargetInterfaceGenerator(scope, @interface, targetType, interfaces, proxyGenerationOptions);
 			}
 			else
 			{
@@ -181,34 +182,31 @@ namespace Castle.DynamicProxy.Serialization
 						generatorType));
 			}
 
-			var proxyType = generator.GenerateCode(targetType, interfaces, proxyGenerationOptions);
+			var proxyType = generator.GetProxyType();
 			return FormatterServices.GetSafeUninitializedObject(proxyType);
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		public object RecreateClassProxy()
 		{
-			var generator = new ClassProxyGenerator(scope, baseType);
-			var proxyType = generator.GenerateCode(interfaces, proxyGenerationOptions);
+			var generator = new ClassProxyGenerator(scope, baseType, interfaces, proxyGenerationOptions);
+			var proxyType = generator.GetProxyType();
 			return InstantiateClassProxy(proxyType);
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
-		private object InstantiateClassProxy(Type proxy_type)
+		private object InstantiateClassProxy(Type proxyType)
 		{
 			delegateToBase = GetValue<bool>("__delegateToBase");
 			if (delegateToBase)
 			{
-				return Activator.CreateInstance(proxy_type, new object[] { info, context });
+				return Activator.CreateInstance(proxyType, new object[] { info, context });
 			}
-			else
-			{
-				return FormatterServices.GetSafeUninitializedObject(proxy_type);
-			}
+			return FormatterServices.GetSafeUninitializedObject(proxyType);
 		}
 
 		protected void InvokeCallback(object target)
@@ -220,7 +218,7 @@ namespace Castle.DynamicProxy.Serialization
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		public object GetRealObject(StreamingContext context)
 		{
@@ -228,16 +226,16 @@ namespace Castle.DynamicProxy.Serialization
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		public void GetObjectData(SerializationInfo info, StreamingContext context)
 		{
 			// There is no need to implement this method as 
 			// this class would never be serialized.
 		}
-
+		
 #if DOTNET40
-		[SecuritySafeCritical]
+		[System.Security.SecuritySafeCritical]
 #endif
 		public void OnDeserialization(object sender)
 		{
@@ -252,7 +250,7 @@ namespace Castle.DynamicProxy.Serialization
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		private void DeserializeProxyMembers()
 		{
@@ -279,16 +277,19 @@ namespace Castle.DynamicProxy.Serialization
 		}
 
 #if DOTNET40
-		[SecurityCritical]
+		[System.Security.SecurityCritical]
 #endif
 		private void DeserializeProxyState()
 		{
-			if (isInterfaceProxy)
+			if (isInterfaceProxy )
 			{
-				var target = GetValue<object>("__target");
-				SetTarget(target);
+				if( omitTarget == false)
+				{
+					var target = GetValue<object>("__target");
+					SetTarget(target);
+				}
 			}
-			else if (!delegateToBase)
+			else if (delegateToBase == false)
 			{
 				var baseMemberData = GetValue<object[]>("__data");
 				var members = FormatterServices.GetSerializableMembers(baseType);
@@ -302,6 +303,11 @@ namespace Castle.DynamicProxy.Serialization
 
 		private void SetTarget(object target)
 		{
+#if DOTNET40
+			dynamic dynamicTarget = target;
+			dynamic dynamicProxy = proxy;
+			dynamicProxy.__target = dynamicTarget;
+#else
 			var targetField = proxy.GetType().GetField("__target");
 			if (targetField == null)
 			{
@@ -310,10 +316,15 @@ namespace Castle.DynamicProxy.Serialization
 			}
 
 			targetField.SetValue(proxy, target);
+#endif
 		}
 
 		private void SetInterceptors(IInterceptor[] interceptors)
 		{
+#if DOTNET40
+			dynamic dynamicProxy = proxy;
+			dynamicProxy.__interceptors = interceptors;
+#else
 			var interceptorField = proxy.GetType().GetField("__interceptors");
 			if (interceptorField == null)
 			{
@@ -322,6 +333,7 @@ namespace Castle.DynamicProxy.Serialization
 			}
 
 			interceptorField.SetValue(proxy, interceptors);
+#endif
 		}
 
 		private T GetValue<T>(string name)

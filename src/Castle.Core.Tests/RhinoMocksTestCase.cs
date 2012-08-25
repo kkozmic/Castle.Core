@@ -22,6 +22,9 @@ namespace Castle.DynamicProxy.Tests
 	using System.Runtime.InteropServices;
 	using Castle.DynamicProxy.Tests.Interceptors;
 	using Castle.DynamicProxy.Tests.Interfaces;
+
+	using CastleTests;
+
 	using NUnit.Framework;
 	using RhinoMocksCPPInterfaces;
 
@@ -165,9 +168,7 @@ namespace Castle.DynamicProxy.Tests
 		public void GenericClassWithGenericMethodWitoutTarget()
 		{
 			var interceptor = new SetReturnValueInterceptor(3);
-			var proxy =
-				(IDoubleGeneric<int>) generator.CreateInterfaceProxyWithoutTarget(typeof (IDoubleGeneric<int>),
-				                                                                  interceptor);
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IDoubleGeneric<int>>(interceptor);
 			var o = proxy.Call(1, "");
 			Assert.AreEqual(3, o);
 		}

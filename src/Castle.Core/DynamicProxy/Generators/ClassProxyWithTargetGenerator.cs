@@ -32,27 +32,23 @@ namespace Castle.DynamicProxy.Generators
 	{
 		private readonly Type[] additionalInterfacesToProxy;
 
-		public ClassProxyWithTargetGenerator(ModuleScope scope, Type classToProxy, Type[] additionalInterfacesToProxy,
-		                                     ProxyGenerationOptions options)
-			: base(scope, classToProxy)
+		public ClassProxyWithTargetGenerator(ModuleScope scope, Type classToProxy, Type[] additionalInterfacesToProxy, ProxyGenerationOptions options)
+			: base(scope, classToProxy, options)
 		{
 			CheckNotGenericTypeDefinition(targetType, "targetType");
 			EnsureDoesNotImplementIProxyTargetAccessor(targetType, "targetType");
 			CheckNotGenericTypeDefinitions(additionalInterfacesToProxy, "additionalInterfacesToProxy");
 
-			options.Initialize();
-			ProxyGenerationOptions = options;
 			this.additionalInterfacesToProxy = TypeUtil.GetAllInterfaces(additionalInterfacesToProxy).ToArray();
 		}
 
-		public Type GetGeneratedType()
+		public override Type GetProxyType()
 		{
 			var cacheKey = new CacheKey(targetType, targetType, additionalInterfacesToProxy, ProxyGenerationOptions);
 			return ObtainProxyType(cacheKey, GenerateType);
 		}
 
-		protected virtual IEnumerable<Type> GetTypeImplementerMapping(out IEnumerable<ITypeContributor> contributors,
-		                                                              INamingScope namingScope)
+		protected virtual Type[] GetTypeImplementerMapping(out IEnumerable<ITypeContributor> contributors, INamingScope namingScope)
 		{
 			var methodsToSkip = new List<MethodInfo>();
 			var proxyInstance = new ClassProxyInstanceContributor(targetType, methodsToSkip, additionalInterfacesToProxy,
@@ -141,7 +137,7 @@ namespace Castle.DynamicProxy.Generators
 				additionalInterfacesContributor,
 				proxyInstance
 			};
-			return typeImplementerMapping.Keys;
+			return typeImplementerMapping.Keys.ToArray();
 		}
 
 		private FieldReference CreateTargetField(ClassEmitter emitter)

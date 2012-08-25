@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Generators.Emitters
+namespace CastleTests.GenInterfaces
 {
-	using System.Collections.ObjectModel;
-
-	public class EventCollection : Collection<EventEmitter>
+	public interface IConstraint_MethodIsType<TType>
 	{
+		void Method<TMethod>() where TMethod : TType;
 	}
 }

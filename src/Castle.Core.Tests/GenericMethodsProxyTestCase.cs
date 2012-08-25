@@ -44,29 +44,33 @@ namespace Castle.DynamicProxy.Tests
 
 			proxy.RegisterType<object, string>();
 
-			var expectedMethod =
+			var expectedMethod = typeof(IInterfaceWithGenericMethodWithDependentConstraint).GetMethod("RegisterType");
+
+			Assert.AreEqual(expectedMethod, interceptor.Invocation.Method);
+
+			var expectedConcreteMethod =
 				typeof(IInterfaceWithGenericMethodWithDependentConstraint).GetMethod("RegisterType").MakeGenericMethod(
 					typeof(object), typeof(string));
 
-			Assert.AreEqual(expectedMethod, interceptor.Invocation.Method);
+			Assert.AreEqual(expectedConcreteMethod, interceptor.Invocation.GetConcreteMethod());
 		}
 
 		[Test]
 		public void GenericMethod_WithConstraintOnSurroundingTypeParameter()
 		{
-			var type = typeof(IGenericInterfaceWithGenericMethodWithDependentConstraint<object>);
-
 			var interceptor = new KeepDataInterceptor();
-			var proxy = (IGenericInterfaceWithGenericMethodWithDependentConstraint<object>)
-			            generator.CreateInterfaceProxyWithoutTarget(type, new Type[] { }, interceptor);
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenericInterfaceWithGenericMethodWithDependentConstraint<object>>(interceptor);
 
 			proxy.RegisterType<string>();
 
-			var expectedMethod =
-				typeof(IGenericInterfaceWithGenericMethodWithDependentConstraint<object>).GetMethod("RegisterType").
-					MakeGenericMethod(typeof(string));
+			var expectedMethod = typeof(IGenericInterfaceWithGenericMethodWithDependentConstraint<object>)
+				.GetMethod("RegisterType");
+			var expectedConcreteMethod = typeof(IGenericInterfaceWithGenericMethodWithDependentConstraint<object>)
+				.GetMethod("RegisterType")
+				.MakeGenericMethod(typeof(string));
 
 			Assert.AreEqual(expectedMethod, interceptor.Invocation.Method);
+			Assert.AreEqual(expectedConcreteMethod, interceptor.Invocation.GetConcreteMethod());
 		}
 
 		[Test]

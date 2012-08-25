@@ -18,9 +18,4 @@ namespace Castle.DynamicProxy.Tests.InterClasses
 	{
 		IInterfaceWithGenericMethodWithDependentConstraint RegisterType<TFrom, TTo> () where TTo : TFrom;
 	}
-
-	public interface IGenericInterfaceWithGenericMethodWithDependentConstraint<TFrom>
-	{
-		IInterfaceWithGenericMethodWithDependentConstraint RegisterType<TTo> () where TTo : TFrom;
-	}
 }

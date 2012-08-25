@@ -18,6 +18,7 @@ namespace Castle.Core.Internal
 	using System.Collections;
 	using System.Collections.Generic;
 	using System.ComponentModel;
+	using System.Linq;
 
 #if SILVERLIGHT
 	using System.Linq;
@@ -26,6 +27,34 @@ namespace Castle.Core.Internal
 	[EditorBrowsable(EditorBrowsableState.Never)]
 	public static class CollectionExtensions
 	{
+		public static bool Any<T>(this T[] items, Predicate<T> predicate)
+		{
+#if SILVERLIGHT
+			if (items == null)
+				throw new ArgumentNullException("items");
+
+			if (predicate == null)
+				throw new ArgumentNullException("predicate");
+			return items.Any(predicate.Invoke);
+#else
+			return Array.Exists(items, predicate);
+#endif
+		}
+
+		public static T[] ConcatAll<T>(params T[][] arrays)
+		{
+			var temp = new List<T>();
+			foreach (var array in arrays)
+			{
+				if (array == null)
+				{
+					continue;
+				}
+				temp.AddRange(array);
+			}
+			return temp.ToArray();
+		}
+
 		public static TResult[] ConvertAll<T, TResult>(this T[] items, Converter<T, TResult> transformation)
 		{
 #if SILVERLIGHT
@@ -33,16 +62,6 @@ namespace Castle.Core.Internal
 #else
 			return Array.ConvertAll(items, transformation);
 #endif
-		}
-
-		public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
-		{
-			if (items == null) return;
-
-			foreach (var item in items)
-			{
-				action(item);
-			}
 		}
 
 		public static T Find<T>(this T[] items, Predicate<T> predicate)
@@ -68,6 +87,19 @@ namespace Castle.Core.Internal
 #endif
 		}
 
+		public static void ForEach<T>(this IEnumerable<T> items, Action<T> action)
+		{
+			if (items == null)
+			{
+				return;
+			}
+
+			foreach (var item in items)
+			{
+				action(item);
+			}
+		}
+
 		/// <summary>
 		///   Checks whether or not collection is null or empty. Assumes colleciton can be safely enumerated multiple times.
 		/// </summary>
@@ -76,6 +108,25 @@ namespace Castle.Core.Internal
 		public static bool IsNullOrEmpty(this IEnumerable @this)
 		{
 			return @this == null || @this.GetEnumerator().MoveNext() == false;
+		}
+
+		public static bool None<T>(this IEnumerable<T> items, Predicate<T> predicate)
+		{
+			return items.Any(predicate.Invoke) == false;
+		}
+
+		public static bool None<T>(this T[] items, Predicate<T> predicate)
+		{
+#if SILVERLIGHT
+			if (items == null)
+				throw new ArgumentNullException("items");
+
+			if (predicate == null)
+				throw new ArgumentNullException("predicate");
+			return items.Any(predicate.Invoke) == false;
+#else
+			return Array.Exists(items, predicate) == false;
+#endif
 		}
 	}
 }

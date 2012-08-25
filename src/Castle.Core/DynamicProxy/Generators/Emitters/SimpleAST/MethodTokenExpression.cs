@@ -37,6 +37,7 @@ namespace Castle.DynamicProxy.Generators.Emitters.SimpleAST
 
 		public override void Emit(IMemberEmitter member, ILGenerator gen)
 		{
+
 			gen.Emit(OpCodes.Ldtoken, method);
 #if !MONO
 			if (declaringType == null)

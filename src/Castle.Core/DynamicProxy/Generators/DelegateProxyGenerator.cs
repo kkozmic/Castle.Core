@@ -16,6 +16,7 @@ namespace Castle.DynamicProxy.Generators
 {
 	using System;
 	using System.Collections.Generic;
+	using System.Linq;
 	using System.Reflection;
 #if !SILVERLIGHT
 	using System.Xml.Serialization;
@@ -28,19 +29,17 @@ namespace Castle.DynamicProxy.Generators
 
 	public class DelegateProxyGenerator : BaseProxyGenerator
 	{
-		public DelegateProxyGenerator(ModuleScope scope, Type delegateType) : base(scope, delegateType)
+		public DelegateProxyGenerator(ModuleScope scope, Type delegateType) : base(scope, delegateType, new ProxyGenerationOptions(new DelegateProxyGenerationHook()))
 		{
-			ProxyGenerationOptions = new ProxyGenerationOptions(new DelegateProxyGenerationHook());
-			ProxyGenerationOptions.Initialize();
 		}
 
-		public Type GetProxyType()
+		public override Type GetProxyType()
 		{
 			var cacheKey = new CacheKey(targetType, null, null);
 			return ObtainProxyType(cacheKey, GenerateType);
 		}
 
-		protected virtual IEnumerable<Type> GetTypeImplementerMapping(out IEnumerable<ITypeContributor> contributors,
+		protected virtual Type[] GetTypeImplementerMapping(out IEnumerable<ITypeContributor> contributors,
 		                                                              INamingScope namingScope)
 		{
 			var methodsToSkip = new List<MethodInfo>();
@@ -67,7 +66,7 @@ namespace Castle.DynamicProxy.Generators
 				proxyTarget,
 				proxyInstance
 			};
-			return typeImplementerMapping.Keys;
+			return typeImplementerMapping.Keys.ToArray();
 		}
 
 		private FieldReference CreateTargetField(ClassEmitter emitter)

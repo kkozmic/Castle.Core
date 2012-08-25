@@ -12,14 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Generators.Emitters
+namespace CastleTests.GenInterfaces
 {
-	using System.Collections.ObjectModel;
-
-	/// <summary>
-	///   Summary description for PropertiesCollection.
-	/// </summary>
-	public class PropertiesCollection : Collection<PropertyEmitter>
+	public interface IEmptyVariant<in T, out T2>
 	{
 	}
 }

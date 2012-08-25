@@ -21,25 +21,21 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 	public class ClassEmitter : AbstractTypeEmitter
 	{
-		private const TypeAttributes DefaultAttributes =
-			TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Serializable;
+		private const TypeAttributes DefaultAttributes = TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.Serializable;
 
 		private readonly ModuleScope moduleScope;
 
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces)
+		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, Type[] interfaces)
 			: this(modulescope, name, baseType, interfaces, DefaultAttributes, ShouldForceUnsigned())
 		{
 		}
 
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces,
-		                    TypeAttributes flags)
+		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, Type[] interfaces, TypeAttributes flags)
 			: this(modulescope, name, baseType, interfaces, flags, ShouldForceUnsigned())
 		{
 		}
 
-		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, IEnumerable<Type> interfaces,
-		                    TypeAttributes flags,
-		                    bool forceUnsigned)
+		public ClassEmitter(ModuleScope modulescope, String name, Type baseType, Type[] interfaces, TypeAttributes flags, bool forceUnsigned)
 			: this(CreateTypeBuilder(modulescope, name, baseType, interfaces, flags, forceUnsigned))
 		{
 			interfaces = InitializeGenericArgumentsFromBases(ref baseType, interfaces);
@@ -66,25 +62,11 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			get { return moduleScope; }
 		}
 
-		protected virtual IEnumerable<Type> InitializeGenericArgumentsFromBases(ref Type baseType,
-		                                                                        IEnumerable<Type> interfaces)
+		protected virtual Type[] InitializeGenericArgumentsFromBases(ref Type baseType, Type[] interfaces)
 		{
 			if (baseType != null && baseType.IsGenericTypeDefinition)
 			{
 				throw new NotSupportedException("ClassEmitter does not support open generic base types. Type: " + baseType.FullName);
-			}
-
-			if (interfaces == null)
-			{
-				return interfaces;
-			}
-
-			foreach (var inter in interfaces)
-			{
-				if (inter.IsGenericTypeDefinition)
-				{
-					throw new NotSupportedException("ClassEmitter does not support open generic interfaces. Type: " + inter.FullName);
-				}
 			}
 			return interfaces;
 		}

@@ -199,6 +199,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -405,9 +406,11 @@
     <Compile Include="DynamicProxy\AbstractInvocation.cs" />
     <Compile Include="DynamicProxy\AllMethodsHook.cs" />
     <Compile Include="AssemblyInfo.cs" />
+    <Compile Include="DynamicProxy\Generators\Emitters\GenericMap.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\SimpleAST\TryStatement.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\SimpleAST\FinallyStatement.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\SimpleAST\EndExceptionBlockStatement.cs" />
+    <Compile Include="DynamicProxy\Generators\IProxyTypeGenerator.cs" />
     <Compile Include="DynamicProxy\Internal\CompositionInvocation.cs" />
     <Compile Include="DynamicProxy\Contributors\ClassProxyWithTargetTargetContributor.cs" />
     <Compile Include="DynamicProxy\Contributors\CompositeTypeContributor.cs" />
@@ -419,6 +422,7 @@
     <Compile Include="DynamicProxy\Contributors\WrappedClassMembersCollector.cs" />
     <Compile Include="DynamicProxy\Generators\AttributeDisassembler.cs" />
     <Compile Include="DynamicProxy\Internal\TypeUtil.cs" />
+    <Compile Include="DynamicProxy\Internal\GenericsHelper.cs" />
     <Compile Include="DynamicProxy\InvalidProxyConstructorArgumentsException.cs" />
     <Compile Include="DynamicProxy\ProxyUtil.cs" />
     <Compile Include="DynamicProxy\Serialization\CacheMappingsAttribute.cs" />
@@ -458,20 +462,15 @@
     <Compile Include="DynamicProxy\Generators\Emitters\CodeBuilders\AbstractCodeBuilder.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\CodeBuilders\ConstructorCodeBuilder.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\CodeBuilders\MethodCodeBuilder.cs" />
-    <Compile Include="DynamicProxy\Generators\Emitters\ConstructorCollection.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\ConstructorEmitter.cs" />
-    <Compile Include="DynamicProxy\Generators\Emitters\EventCollection.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\EventEmitter.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\GenericUtil.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\IMemberEmitter.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\LdcOpCodesDictionary.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\LdindOpCodesDictionary.cs" />
-    <Compile Include="DynamicProxy\Generators\Emitters\MethodCollection.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\MethodEmitter.cs" />
-    <Compile Include="DynamicProxy\Generators\Emitters\NestedClassCollection.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\NestedClassEmitter.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\OpCodeUtil.cs" />
-    <Compile Include="DynamicProxy\Generators\Emitters\PropertiesCollection.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\PropertyEmitter.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\SimpleAST\AddressOfReferenceExpression.cs" />
     <Compile Include="DynamicProxy\Generators\Emitters\SimpleAST\ArgumentReference.cs" />
@@ -555,6 +554,7 @@
     <Compile Include="DynamicProxy\Tokens\InterceptorSelectorMethods.cs" />
     <Compile Include="DynamicProxy\Tokens\InvocationMethods.cs" />
     <Compile Include="DynamicProxy\Tokens\MethodBaseMethods.cs" />
+    <Compile Include="DynamicProxy\Tokens\MethodInfoMethods.cs" />
     <Compile Include="DynamicProxy\Tokens\SerializationInfoMethods.cs" />
     <Compile Include="DynamicProxy\Tokens\TypeBuilderMethods.cs" />
     <Compile Include="DynamicProxy\Tokens\TypeMethods.cs" />

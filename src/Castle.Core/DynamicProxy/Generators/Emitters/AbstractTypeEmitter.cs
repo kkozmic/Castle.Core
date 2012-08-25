@@ -23,35 +23,24 @@ namespace Castle.DynamicProxy.Generators.Emitters
 	using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 	using Castle.DynamicProxy.Internal;
 
+	[DebuggerDisplay("{typeBuilder.Name}")]
 	public abstract class AbstractTypeEmitter
 	{
-		private const MethodAttributes defaultAttributes =
-			MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Public;
+		private const MethodAttributes defaultAttributes = MethodAttributes.HideBySig | MethodAttributes.Virtual | MethodAttributes.Public;
+		protected readonly GenericMap name2GenericType = new GenericMap();
 
-		private readonly ConstructorCollection constructors;
-		private readonly EventCollection events;
-
-		private readonly IDictionary<string, FieldReference> fields =
-			new Dictionary<string, FieldReference>(StringComparer.OrdinalIgnoreCase);
-
-		private readonly MethodCollection methods;
-
-		private readonly Dictionary<String, GenericTypeParameterBuilder> name2GenericType;
-		private readonly NestedClassCollection nested;
-		private readonly PropertiesCollection properties;
-		private readonly TypeBuilder typebuilder;
-
+		private readonly List<ConstructorEmitter> constructors = new List<ConstructorEmitter>();
+		private readonly List<EventEmitter> events = new List<EventEmitter>();
+		private readonly Dictionary<String, FieldReference> fields = new Dictionary<String, FieldReference>();
+		private readonly List<MethodEmitter> methods = new List<MethodEmitter>();
+		private readonly List<NestedClassEmitter> nested = new List<NestedClassEmitter>();
+		private readonly List<PropertyEmitter> properties = new List<PropertyEmitter>();
+		private readonly TypeBuilder typeBuilder;
 		private GenericTypeParameterBuilder[] genericTypeParams;
 
 		protected AbstractTypeEmitter(TypeBuilder typeBuilder)
 		{
-			typebuilder = typeBuilder;
-			nested = new NestedClassCollection();
-			methods = new MethodCollection();
-			constructors = new ConstructorCollection();
-			properties = new PropertiesCollection();
-			events = new EventCollection();
-			name2GenericType = new Dictionary<String, GenericTypeParameterBuilder>();
+			this.typeBuilder = typeBuilder;
 		}
 
 		public Type BaseType
@@ -68,7 +57,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public TypeConstructorEmitter ClassConstructor { get; private set; }
 
-		public ConstructorCollection Constructors
+		public ICollection<ConstructorEmitter> Constructors
 		{
 			get { return constructors; }
 		}
@@ -78,14 +67,19 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			get { return genericTypeParams; }
 		}
 
-		public NestedClassCollection Nested
+		public bool IsGenericType
+		{
+			get { return genericTypeParams != null; }
+		}
+
+		public ICollection<NestedClassEmitter> Nested
 		{
 			get { return nested; }
 		}
 
 		public TypeBuilder TypeBuilder
 		{
-			get { return typebuilder; }
+			get { return typeBuilder; }
 		}
 
 		public void AddCustomAttributes(ProxyGenerationOptions proxyGenerationOptions)
@@ -95,21 +89,32 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				var customAttributeBuilder = AttributeUtil.CreateBuilder(attr);
 				if (customAttributeBuilder != null)
 				{
-					typebuilder.SetCustomAttribute(customAttributeBuilder);
+					typeBuilder.SetCustomAttribute(customAttributeBuilder);
 				}
 			}
 
 			foreach (var attribute in proxyGenerationOptions.AdditionalAttributes)
 			{
-				typebuilder.SetCustomAttribute(attribute);
+				typeBuilder.SetCustomAttribute(attribute);
 			}
+		}
+
+		public MethodInfo AdjustMethod(MethodInfo method)
+		{
+			if (method.DeclaringType.IsGenericTypeDefinition == false || genericTypeParams == null)
+			{
+				return method;
+			}
+			var closedType = method.DeclaringType.GetGenericTypeDefinition().MakeGenericType(GenericTypeParams);
+			var closedMethod = TypeBuilder.GetMethod(closedType, method);
+			return closedMethod;
 		}
 
 		public virtual Type BuildType()
 		{
 			EnsureBuildersAreInAValidState();
 
-			var type = CreateType(typebuilder);
+			var type = CreateType(typeBuilder);
 
 			foreach (var builder in nested)
 			{
@@ -127,7 +132,20 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				throw new ProxyGenerationException("CopyGenericParametersFromMethod: cannot invoke me twice");
 			}
 
-			SetGenericTypeParameters(GenericUtil.CopyGenericArguments(methodToCopyGenericsFrom, typebuilder, name2GenericType));
+			var arguments = GenericUtil.CopyGenericArguments(methodToCopyGenericsFrom, typeBuilder, name2GenericType);
+			SetGenericTypeParameters(arguments);
+		}
+
+		public void CopyGenericParametersFromType(Type typeToCopyGenericsFrom, MethodInfo methodToCopyGenericsFrom = null)
+		{
+			// big sanity check
+			if (genericTypeParams != null)
+			{
+				throw new ProxyGenerationException("CopyGenericParametersFromMethod: cannot invoke me twice");
+			}
+
+			var arguments = GenericUtil.CopyGenericArguments(typeToCopyGenericsFrom, methodToCopyGenericsFrom, typeBuilder, name2GenericType);
+			SetGenericTypeParameters(arguments);
 		}
 
 		public ConstructorEmitter CreateConstructor(params ArgumentReference[] arguments)
@@ -178,7 +196,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public FieldReference CreateField(string name, Type fieldType, FieldAttributes atts)
 		{
-			var fieldBuilder = typebuilder.DefineField(name, fieldType, atts);
+			var fieldBuilder = typeBuilder.DefineField(name, fieldType, atts);
 			var reference = new FieldReference(fieldBuilder);
 			fields[name] = reference;
 			return reference;
@@ -236,19 +254,19 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public void DefineCustomAttribute(CustomAttributeBuilder attribute)
 		{
-			typebuilder.SetCustomAttribute(attribute);
+			typeBuilder.SetCustomAttribute(attribute);
 		}
 
 		public void DefineCustomAttribute<TAttribute>(object[] constructorArguments) where TAttribute : Attribute
 		{
 			var customAttributeBuilder = AttributeUtil.CreateBuilder(typeof(TAttribute), constructorArguments);
-			typebuilder.SetCustomAttribute(customAttributeBuilder);
+			typeBuilder.SetCustomAttribute(customAttributeBuilder);
 		}
 
 		public void DefineCustomAttribute<TAttribute>() where TAttribute : Attribute, new()
 		{
 			var customAttributeBuilder = AttributeUtil.CreateBuilder<TAttribute>();
-			typebuilder.SetCustomAttribute(customAttributeBuilder);
+			typeBuilder.SetCustomAttribute(customAttributeBuilder);
 		}
 
 		public void DefineCustomAttributeFor<TAttribute>(FieldReference field) where TAttribute : Attribute, new()
@@ -282,18 +300,17 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		public Type GetGenericArgument(String genericArgumentName)
 		{
-			return name2GenericType[genericArgumentName];
+			return name2GenericType.GetBuilder(genericArgumentName);
 		}
 
 		public Type[] GetGenericArgumentsFor(Type genericType)
 		{
 			var types = new List<Type>();
-
 			foreach (var genType in genericType.GetGenericArguments())
 			{
 				if (genType.IsGenericParameter)
 				{
-					types.Add(name2GenericType[genType.Name]);
+					types.Add(name2GenericType.GetBuilder(genType.Name));
 				}
 				else
 				{
@@ -309,15 +326,10 @@ namespace Castle.DynamicProxy.Generators.Emitters
 			var types = new List<Type>();
 			foreach (var genType in genericMethod.GetGenericArguments())
 			{
-				types.Add(name2GenericType[genType.Name]);
+				types.Add(name2GenericType.GetBuilder(genType.Name));
 			}
 
 			return types.ToArray();
-		}
-
-		public void SetGenericTypeParameters(GenericTypeParameterBuilder[] genericTypeParameterBuilders)
-		{
-			genericTypeParams = genericTypeParameterBuilders;
 		}
 
 		protected Type CreateType(TypeBuilder type)
@@ -356,7 +368,7 @@ namespace Castle.DynamicProxy.Generators.Emitters
 
 		protected virtual void EnsureBuildersAreInAValidState()
 		{
-			if (!typebuilder.IsInterface && constructors.Count == 0)
+			if (!typeBuilder.IsInterface && constructors.Count == 0)
 			{
 				CreateDefaultConstructor();
 			}
@@ -381,6 +393,11 @@ namespace Castle.DynamicProxy.Generators.Emitters
 				builder.EnsureValidCodeBlock();
 				builder.Generate();
 			}
+		}
+
+		protected void SetGenericTypeParameters(GenericTypeParameterBuilder[] genericTypeParameterBuilders)
+		{
+			genericTypeParams = genericTypeParameterBuilders;
 		}
 	}
 }

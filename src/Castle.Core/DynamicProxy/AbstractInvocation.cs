@@ -32,7 +32,7 @@ namespace Castle.DynamicProxy
 		private readonly IInterceptor[] interceptors;
 		private readonly object[] arguments;
 		private int currentInterceptorIndex = -1;
-		private Type[] genericMethodArguments;
+		private Type[] genericMethodArguments = Type.EmptyTypes;
 		private readonly MethodInfo proxiedMethod;
 		protected readonly object proxyObject;
 
@@ -201,7 +201,7 @@ namespace Castle.DynamicProxy
 
 		private MethodInfo EnsureClosedMethod(MethodInfo method)
 		{
-			if (method.ContainsGenericParameters)
+			if (method.IsGenericMethodDefinition)
 			{
 				Debug.Assert(genericMethodArguments != null);
 				return method.GetGenericMethodDefinition().MakeGenericMethod(genericMethodArguments);

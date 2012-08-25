@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-namespace Castle.DynamicProxy.Tests
+namespace CastleTests
 {
 	using System;
 	using System.Collections.Generic;
 	using System.Reflection;
 
 	using Castle.DynamicProxy.Generators;
+	using Castle.DynamicProxy.Tests;
 	using Castle.DynamicProxy.Tests.GenInterfaces;
 	using Castle.DynamicProxy.Tests.Interceptors;
 	using Castle.DynamicProxy.Tests.Interfaces;
@@ -29,17 +30,15 @@ namespace Castle.DynamicProxy.Tests
 	{
 		private LogInvocationInterceptor logger;
 
-		public override void Init()
+		protected override void AfterInit()
 		{
-			base.Init();
 			logger = new LogInvocationInterceptor();
 		}
 
 		[Test]
 		public void Type_has_constraint_T_on_interface_method_has_constraint_T1_on_T()
 		{
-			generator.CreateInterfaceProxyWithoutTarget
-				<IGenericInterfaceWithGenericMethodWithCascadingConstraintOnInterface<IEmpty>>();
+			generator.CreateInterfaceProxyWithoutTarget<IGenericInterfaceWithGenericMethodWithCascadingConstraintOnInterface<IEmpty>>();
 		}
 
 		[Test]
@@ -51,23 +50,19 @@ namespace Castle.DynamicProxy.Tests
 		[Test]
 		public void Type_has_constraint_T_on_reference_type_method_has_constraint_T1_on_T()
 		{
-			generator.CreateInterfaceProxyWithoutTarget
-				<IGenericInterfaceWithGenericMethodWithCascadingConstraintOnAnyReferenceType<Empty>>();
+			generator.CreateInterfaceProxyWithoutTarget<IGenericInterfaceWithGenericMethodWithCascadingConstraintOnAnyReferenceType<Empty>>();
 		}
 
 		[Test]
 		public void Type_has_constraint_T_on_type_with_default_ctor_method_has_constraint_T1_on_T()
 		{
-			generator.CreateInterfaceProxyWithoutTarget
-				<IGenericInterfaceWithGenericMethodWithCascadingConstraintOnAnyTypeWithDefaultConstructor<Empty>>();
+			generator.CreateInterfaceProxyWithoutTarget<IGenericInterfaceWithGenericMethodWithCascadingConstraintOnAnyTypeWithDefaultConstructor<Empty>>();
 		}
 
 		[Test]
 		public void ProxyWithGenericArgument()
 		{
-			var proxy =
-				generator.CreateInterfaceProxyWithTarget<GenInterface<int>>(
-					new GenInterfaceImpl<int>(), logger);
+			var proxy = generator.CreateInterfaceProxyWithTarget<GenInterface<int>>(new GenInterfaceImpl<int>(), logger);
 
 			Assert.IsNotNull(proxy);
 
@@ -220,8 +215,7 @@ namespace Castle.DynamicProxy.Tests
 		public void MethodInfoClosedInGenIfcGenMethodValueTypeNoTarget()
 		{
 			var interceptor = new KeepDataInterceptor();
-			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<GenInterfaceWithGenMethods<int>>(interceptor);
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<GenInterfaceWithGenMethods<int>>(interceptor);
 
 			proxy.DoSomething(1, 1);
 			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(void), typeof(int),
@@ -236,15 +230,13 @@ namespace Castle.DynamicProxy.Tests
 		public void MethodInfoClosedInGenIfcNongenMethodRefTypeNoTarget()
 		{
 			var interceptor = new KeepDataInterceptor();
-			var proxy =
-				generator.CreateInterfaceProxyWithoutTarget<IGenInterfaceHierarchyBase<List<object>>>(interceptor);
+			var proxy = generator.CreateInterfaceProxyWithoutTarget<IGenInterfaceHierarchyBase<List<object>>>(interceptor);
 
 			proxy.Get();
 			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(List<object>));
 
 			proxy.Add(null);
-			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(void),
-			                                           typeof(List<object>));
+			GenericTestUtility.CheckMethodInfoIsClosed(interceptor.Invocation.GetConcreteMethod(), typeof(void), typeof(List<object>));
 		}
 
 		[Test]
