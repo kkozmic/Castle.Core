@@ -42,7 +42,7 @@ namespace CastleTests
 			object proxy = generator.CreateClassProxy(typeof(ServiceClass), new ResultModifierInterceptor());
 
 			Assert.IsNotNull(proxy);
-			Assert.IsTrue(typeof(ServiceClass).IsAssignableFrom(proxy.GetType()));
+			Assert.IsInstanceOf<ServiceClass>(proxy);
 
 			ServiceClass instance = (ServiceClass)proxy;
 
@@ -210,8 +210,8 @@ namespace CastleTests
 													  new ResultModifierInterceptor());
 
 			Assert.IsNotNull(proxy);
-			Assert.IsTrue(typeof(ServiceClass).IsAssignableFrom(proxy.GetType()));
-			Assert.IsTrue(typeof(IDisposable).IsAssignableFrom(proxy.GetType()));
+			Assert.IsInstanceOf<ServiceClass>(proxy);
+			Assert.IsInstanceOf<IDisposable>(proxy);
 
 			ServiceClass inter = (ServiceClass)proxy;
 
